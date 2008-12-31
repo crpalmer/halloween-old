@@ -1,0 +1,8 @@
+CC1B=c:/prop-sx/cc1b/task
+C4SX=c:/prop-sx/c4sx
+
+CC=$(CC1B)/cc1b.exe
+CFLAGS=-I$(CC1B) -I$(C4SX) -dc
+
+%.hex: %.c
+	$(CC) $(CFLAGS) -a$(<,.c,.src) $<

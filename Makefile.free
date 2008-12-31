@@ -1,0 +1,12 @@
+CC1B=c:/prop-sx/cc1b/free
+C4SX=c:/prop-sx/c4sx
+
+CC=$(CC1B)/cc1b.exe
+CFLAGS=-I$(CC1B) -I$(C4SX) -dc
+CC1B2SX=$(C4SX)/cc1b2sx.exe
+
+%.src: %.foo
+	$(CC1B2SX) < $< > $@
+
+%.hex %.foo: %.c
+	$(CC) $(CFLAGS) -a$(<:.c=.foo) $<
