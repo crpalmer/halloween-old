@@ -1,12 +1,12 @@
-#ifndef __DELAY_C__
-#define __DELAY_C__
+#ifndef __DELAY_LOOP_C__
+#define __DELAY_LOOP_C__
 
 #ifndef FREQ_MHZ
 #error "You must define FREQ_MHZ to be the clock speed in Mhz"
 #endif
 
 void
-delay(uns16 ms)
+delay_loop(uns16 ms)
 {
     while (ms > 0) {
 	/* 17 instructions per loop */
