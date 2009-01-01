@@ -1,55 +1,23 @@
-// ledc28.c:  blink led on RB pin 0 -- simple SX C program for CC1B compiler
-//                 C program similar to led28.src (assemlber for SX)
-//                 modified 07/30/2007 to include SX-Key directives
-//                 modified 09/02/2007 to use new CC1B 0.7A features
-
 #pragma chip SX28 // select device
 
-#pragma asmDir:	DEVICE OSCHS3
+#pragma asmDir:	DEVICE OSC4MHZ, TURBO, STACKX, OPTIONX
 #pragma asmDir:	IRC_CAL IRC_FAST
-#pragma asmDir:	FREQ	50_000_000
-#pragma asmDir:	ID	'project'
+#pragma asmDir:	FREQ	4_000_000
+#pragma asmDir:	ID	'leds'
+#define FREQ_MHZ 4
 
-// ************************************************
-// ************************************************
-// MACRO DEFINITIONS AND CONSTANTS
 
-#define MAX_COUNT1 10
-#define MAX_COUNT2 255
-#define MAX_COUNT3 255
- 
-// ************************************************
-// ************************************************
-// IO PORT DEFINITIONS
+/* IO PORT DEFINITIONS */
+
 
 bit pinB0 @ RB.0;
 
-// ************************************************
-// ************************************************
+
+
 // GLOBAL VARIABLE DEFINITIONS
 
 #pragma rambank 0
-// unsigned char Count1, Count2;          // located in ram bank 0
 
-#pragma rambank 2
-
-
-// ************************************************
-// ************************************************
-// PROTOTYPES AND CODEPAGES
-
-/* Prototypes are needed when a function is called before it
-is defined. It can also be used for fine tuning the code
-layout (i.e. which codepage to use for a function). */
-
-void delay( void);
-page2 char function2( void);
-
-
-
-// ************************************************
-// ************************************************
-// INTERRUPT SUPPORT
 
 #pragma origin 0   // interrupt must be located first on codepage 0
 
@@ -67,36 +35,13 @@ interrupt iServer(void)
 // ************************************************
 // INCLUDED C FILES AND MATH ROUTINES
 
-// none in this program
+#include "delay.c"
 
 #pragma codepage 0
 
-// ************************************************
-// ************************************************
-// C FUNCTIONS
-
-
-void delay( void)
+void
+main(void)
 {
-	unsigned char Count1, Count2, Count3;  
-	for (Count1 = MAX_COUNT1; Count1 != 0; Count1--) {
-		for (Count2 = MAX_COUNT2; Count2 != 0; Count2--) {
-			for (Count3 = MAX_COUNT3; Count3 != 0; Count3--) {
-			// do nothing
-			}
-		}
-	}
-	
-	return;
-
-}
-
-
-void main(void)
-{
-
-	// OPTION = 0xa8;  // ints off!
-	
     clearRAM();  // built in function
 #if 0
 	
@@ -122,10 +67,10 @@ void main(void)
 	bit holdB0 @ hold.0;	
 	// bank1 char c;
 
-	TRISB = 0xfe;   // %1111 1110
-	RB = 0;
+	TRISB = 0;   // %1111 1110
+	RB = 1;
 	while (1) {
-	  delay();
+	  delay(1000);
 	  holdB0 = pinB0;
 	  hold++;
 	  pinB0 = holdB0;

@@ -1,0 +1,2 @@
+4MHZ resonator needs OSCHS1
+others work with OSCHS2
