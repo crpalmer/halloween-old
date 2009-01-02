@@ -34,9 +34,9 @@ delay_rtcc256(uns16 reps, uns16 us)
 	while (rt == RTCC) {}
 
 	acc += 256;
-	if (acc >= us) {
+	while (acc >= us) {
 	    acc -= us;
-	    reps --;
+	    if (reps > 0) reps --;
 	}
     }
 }
