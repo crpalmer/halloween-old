@@ -83,7 +83,7 @@ main(void)
 		head_at = head_bottom;
 	    } else if (head_at > head_top) {
 		head_dir = 0;
-		head_to = head_top;
+		head_at = head_top;
 	    }
 	    PULSOUT(HEAD, head_at);
 	    delay_rtcc256_ms(20);
