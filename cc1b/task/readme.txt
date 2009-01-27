@@ -28,7 +28,7 @@ RESTRICTIONS
 COPYRIGHT NOTICE
 ----------------
 
-  Copyright (c) B Knudsen Data, Trondheim, Norway, 2002 - 2008.
+  Copyright (c) B Knudsen Data, Trondheim, Norway, 2002 - 2009.
 
   www.bknd.com
 
