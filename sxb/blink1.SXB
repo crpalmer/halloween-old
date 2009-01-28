@@ -1,0 +1,15 @@
+' BLINK1.SXB
+
+DEVICE          SX28, OSC4MHZ, TURBO, STACKX, OPTIONX, BOR42
+FREQ            4_000_000
+
+Led             PIN     RB.0
+
+PROGRAM Start
+
+Start:
+  HIGH Led
+  PAUSE 100
+  LOW Led
+  PAUSE 100
+  GOTO Start

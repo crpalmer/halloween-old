@@ -1,0 +1,28 @@
+DEVICE          SX28, OSCHS1, TURBO, STACKX, OPTIONX, BOR42
+FREQ            50_000_000
+
+irPulse        VAR     Word                  ' Stores pulse widths
+remoteCode     VAR     Byte                  ' Stores remote code
+temp1	       VAR     Word
+temp2	       VAR 	byte
+
+LCD	PIN	RC.0
+
+PROGRAM start
+
+start:
+
+  pause 5
+  serout LCD, T2400, $0C		; cls, needs 5 ms pause
+  pause 100
+  serout lcd, T2400, $11		; backlight on
+
+do
+  serout LCD, T2400, "T"
+  serout LCD, T2400, "e"
+  serout LCD, T2400, "s"
+  serout LCD, T2400, "t"
+  serout LCD, T2400, 13
+  serout LCD, T2400, $11
+  pause 1000
+loop
