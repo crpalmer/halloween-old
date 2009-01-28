@@ -3,7 +3,7 @@ CC1B=$(BASE)/cc1b/free
 C4SX=$(BASE)/c4sx
 
 CC=$(CC1B)/cc1b.exe
-CFLAGS=-I$(CC1B) -I$(C4SX) -I$(BASE)/lib -dc
+CFLAGS=-I$(CC1B) -I$(C4SX) -I$(BASE)/lib -dc -cu
 CC1B2SX=$(C4SX)/cc1b2sx.exe
 
 %.src: %.foo
