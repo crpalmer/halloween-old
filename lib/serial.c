@@ -25,14 +25,6 @@
 #error "You must define SERIAL_BAUD to be the desired baud rate"
 #endif
 
-/* I want to write
- 
-   ((FREQ_MHZ * 1000 * 1000 / SERIAL_BAUD) - 2) / 4
- */
-
-#define SERIAL_DELAY_LOOPS \
-	((FREQ_MHZ * 250 * 10) / (SERIAL_BAUD/100) - 1)
-
 #ifndef SERIAL_TX_PIN
 #error "You must define SERIAL_TX_PIN"
 #endif
@@ -40,6 +32,19 @@
 #ifndef SERIAL_FUNCTION_NAME_PREFIX
 #define SERIAL_FUNCTION_NAME_PREFIX
 #endif
+
+#define SERIAL_DELAY_10US	(100*1000 / SERIAL_BAUD)
+
+#if SERIAL_DELAY_10US <= 255
+#define SERIAL_DELAY() delay_10us(SERIAL_DELAY_10US)
+#else
+#if SERIAL_DELAY_10US > 255*2
+#error "Oops, I didn't see this coming."
+#endif
+#define SERIAL_DELAY() \
+	do { delay_10us(255); delay_10us(SERIAL_DELAY_10US-255); } while(0)
+#endif
+	
 
 #define SERIAL_FUNCTION_NAME(x) SERIAL_FUNCTION_NAME_PREFIX##x
 #define SERIAL_TX_BYTE SERIAL_FUNCTION_NAME(serial_tx_byte)
@@ -49,22 +54,18 @@ void
 SERIAL_TX_BYTE(uns8 byte)
 {
     uns8 bits = 10;
-    uns8 x;
 
-#pragma updateBank 0
     SERIAL_TX_PIN = 0;
-    do {
-	x = SERIAL_DELAY_LOOPS;
-loop:
-	x--;
-	if (x) goto loop;	/* 4 per loop + 2 */
-        SERIAL_TX_PIN = byte.0;	/* 4 cycles */
+    for (;;) {
+	SERIAL_DELAY();
+	if (bits == 0) return;
+	bits--;
+        SERIAL_TX_PIN = byte.0;
 	/*<?asm
-	STC			; 1 cycle
+	STC
 	?>*/
-        byte = rr(byte);	/* 1 cycle */
-    } while (--bits > 0);	/* 4 cycles + 2 to exit */
-#pragma updateBank 1
+        byte = rr(byte);
+    }
 }
 
 void
