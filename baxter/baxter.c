@@ -39,7 +39,7 @@ interrupt iServer(void)
 #pragma rambank 0
 
 #define HEAD_SPEED  20
-#define HEAD_TO	     4
+#define HEAD_TO	     3
 
 void
 main(void)
