@@ -18,29 +18,32 @@ DEVICE SX28, OSCHS1, BOR26
 FREQ 4_000_000
 STACK 16  
 
-
 LOAD "common.sxb"
 LOAD "sio.sxb"
 
-BUTTON1  PIN RB.0 INPUT
-BUTTON2  PIN RB.1 INPUT
-OVERRIDE PIN RB.2 INPUT
-PIR      PIN RB.6 INPUT
+' ============ INPUTS ===============
 
-HEAD     PIN RC.0 OUTPUT
-TAIL     PIN RC.1 OUTPUT
+BUTTON1  	PIN 	RB.0 INPUT
+BUTTON2  	PIN 	RB.1 INPUT
+OVERRIDE 	PIN 	RB.2 INPUT
+PIR      	PIN 	RB.6 INPUT
 
-' Constants
+' ============ OUTPUTS ==============
+
+HEAD     	PIN 	RC.0 OUTPUT
+TAIL     	PIN 	RC.1 OUTPUT
+
+' ============ Constants ============
 
 AUDIO:
 DATA	 "!AP8%00"                   ' both address jumpers out
 
-' Variables
+' ============ Variables =============
 
-x1 VAR BYTE                                 ' temporary used throughout
-playing VAR BIT                          ' bit when temp is the AP-8 status
-eeprom_base VAR BYTE                        ' address of our current action in data table
-R VAR WORD                                  ' random
+x1		VAR BYTE                                 ' temporary used throughout
+playing		VAR BIT                          ' bit when temp is the AP-8 status
+eeprom_base	VAR BYTE                        ' address of our current action in data table
+R		VAR WORD                                  ' random
 
 
 head_speed VAR BYTE                         ' current rate of movement for head
