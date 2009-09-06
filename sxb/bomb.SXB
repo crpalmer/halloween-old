@@ -51,7 +51,22 @@ counting_down:
     GOTO counting_down		' when run at a high speed with a high baud rate
   ENDIF
 
-  PAUSE 5000
+  ' trigger the bomb
+
+  time = 10
+flash_zero:
+  byte_to_lcd $0C
+  pause 250
+  byte_to_lcd $85
+  byte_to_lcd "0"
+  byte_to_lcd "0"
+  byte_to_lcd ":"
+  byte_to_lcd "0"
+  byte_to_lcd "0"
+  pause 250
+  time = time - 1
+  if time > 0 then flash_zero
+
   GOTO main
 
 SUB digit_to_lcd
