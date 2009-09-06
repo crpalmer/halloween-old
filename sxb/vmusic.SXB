@@ -30,7 +30,7 @@
 ID              "VMUSIC"
 
 DEVICE          SX28, OSCHS3, TURBO, STACKX, OPTIONX, BOR42
-FREQ            4_000_000
+FREQ            50_000_000
 
 
 ' -------------------------------------------------------------------------
@@ -102,7 +102,7 @@ Start:
 
   HIGH RB.5
   TX = 1                                        ' set to idle
-  DELAY_MS 4_000                                ' let VMUSIC power up
+  DELAY_MS 6_000                                ' let VMUSIC power up
   LOW RB.5
   TX_BYTE CR                                    ' ping VMUSIC
   HIGH RB.4

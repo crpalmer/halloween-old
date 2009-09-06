@@ -1,0 +1,64 @@
+'BANK $1
+
+TX_BYTE		SUB	1,2
+TX_STR		SUB	1,3
+
+' Use: TX_BYTE theByte {, count}
+' -- transmit "theByte" at "Baud" on "SOut"
+' -- optional "count" may be specified (must be > 0)
+
+SUB TX_BYTE
+  temp1 VAR BYTE
+  temp2 VAR BYTE
+
+  temp1 = __PARAM1                              ' save byte
+  IF __PARAMCNT = 1 THEN                        ' if no count
+    temp2 = 1                                   '   set to 1
+  ELSE                                          ' otherwise
+    temp2 = __PARAM2                            '   get count
+    IF temp2 = 0 THEN                           ' do not allow 0
+      temp2 = 1
+    ENDIF
+  ENDIF
+  DO WHILE temp2 > 0                            ' loop through count
+    SEROUT SIO, Baud, temp1                    ' send the byte
+    DEC temp2                                   ' decrement count
+  LOOP
+ENDSUB
+
+
+' Use: TX_STR [string | label] {, count {, offset }}
+' -- "string" is an embeded string constant
+' -- "label" is DATA statement label for stored z-String
+' -- "count" is number of characters to send (0 is entire string)
+' -- "offset" is offset from head of string
+
+SUB TX_STR
+  temp3 VAR BYTE
+  temp4 VAR BYTE
+  temp5 VAR BYTE
+  temp6 VAR BYTE
+
+  temp3 = __PARAM1                              ' get string offset
+  temp4 = __PARAM2                              ' get string base
+  temp5 = 0                                     ' do whole string
+
+  IF __PARAMCNT >= 3 THEN                       ' count specified?
+    temp5 = __PARAM3                            ' -- yes, get count
+  ENDIF
+
+  IF __PARAMCNT = 4 THEN                        ' offset specified?
+    temp3 = temp3 + __PARAM4                    '  -- yes, update it
+    temp4 = temp4 + C
+  ENDIF
+
+  DO
+    READ temp4 + temp3, temp6                   ' read a character
+    IF temp6 = 0 THEN EXIT                      ' if 0, string complete
+    TX_BYTE temp6                               ' send character
+    DEC temp5                                   ' update count
+    IF temp5 = 0 THEN EXIT                      ' terminate if done
+    INC temp3                                   ' point to next character
+    temp4 = temp4 + Z                           ' update base on overflow
+  LOOP
+ENDSUB

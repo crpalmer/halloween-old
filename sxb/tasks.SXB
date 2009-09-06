@@ -1,0 +1,35 @@
+' TASK demo code
+' Connect RB.0 to RB.4 to five LEDs
+'
+DEVICE SX28, OSC4MHZ, BOR26
+FREQ 4_000_000
+STACK 16             
+ 
+LEDS    PIN RB OUTPUT ' Connect RB.0 to RB.4 to five LEDs
+ 
+SUB INTERRUPT 1250 ' Interrupt every 1/1250 seconds (0.8milliSeconds)
+  TASKS RUN, 100   ' Task "tick" is 0.8*100milliseconds (80 milliseconds)
+ENDSUB
+ 
+ToggleLED TASK
+ 
+PROGRAM Start
+ 
+Start:
+  TASKS SET, 0, ToggleLED, 10, 1 ' Run this task every 10 ticks, wait 1 tick before 1st run
+  TASKS SET, 1, ToggleLED, 10, 3 ' Run this task every 10 ticks, wait 3 ticks before 1st run
+  TASKS SET, 2, ToggleLED, 10, 5 ' Run this task every 10 ticks, wait 5 ticks before 1st run
+  TASKS SET, 3, ToggleLED, 10, 7 ' Run this task every 10 ticks, wait 7 ticks before 1st run
+  TASKS SET, 4, ToggleLED, 10, 9 ' Run this task every 10 ticks, wait 9 ticks before 1st run
+  TASKS ENABLE ' Start task handling
+ 
+  ' Do nothing forever (while tasks continue to run in the background)
+  DO
+  LOOP
+END
+
+TASK ToggleLED
+  taskSlot VAR BYTE        ' This is local variable
+  taskSlot = __PARAM1      ' Task slot that called this task
+  PUTBIT LEDS, taskSlot, 2 ' "2" means to invert(toggle)the bit
+ENDTASK

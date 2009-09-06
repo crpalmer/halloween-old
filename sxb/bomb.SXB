@@ -19,28 +19,36 @@ start:
 
 main:
 
-  time = 15*60
-  byte_to_lcd $0C		' cls, needs 5 ms pause
+  byte_to_lcd $0C		' cls, needs 5 ms pause, give it a little extra just in case
   PAUSE 100
+
+  time = 15*60
 
 counting_down:
   time = time - 1
-  byte_to_lcd $80		' goto position (0,0)
+
+  byte_to_lcd $85		' goto position (0,5)
+
   digit = time / 600
   digit = digit // 10
   digit_to_lcd digit_LSB
+
   digit = time / 60
   digit = digit // 10
   digit_to_lcd digit_LSB
+
   byte_to_lcd ":"
+
   digit = time / 10
   digit = digit // 6
   digit_to_lcd digit_LSB
+
   digit = time // 10
   digit_to_lcd digit_LSB
+
   IF time > 0 THEN
-    PAUSE 1000
-    GOTO counting_down
+    PAUSE 1000			' off by a little bit due to execution, but close enough
+    GOTO counting_down		' when run at a high speed with a high baud rate
   ENDIF
 
   PAUSE 5000
