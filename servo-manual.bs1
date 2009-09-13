@@ -1,0 +1,46 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL servo1 = 3
+SYMBOL servo2 = 4
+SYMBOL left  = PIN0
+SYMBOL right = PIN1
+SYMBOL switch = PIN2
+
+SYMBOL SPEED   = 10
+SYMBOL MIN_POS = 80
+SYMBOL MAX_POS = 220
+
+SYMBOL pos = W0
+SYMBOL time = B2
+
+pos = 150
+
+main:
+
+time = 19
+
+IF left = 0 THEN check_right
+pos = pos - 10 MIN MIN_POS
+DEBUG " L", #pos
+time = time - 3
+
+check_right:
+
+IF right = 0 THEN move
+pos = pos + 10 MAX MAX_POS
+DEBUG " R", #pos
+time = time - 3
+
+move:
+
+IF switch = 1 THEN move1
+
+PULSOUT servo2, pos
+PAUSE time
+GOTO main
+
+move1:
+PULSOUT servo1, pos
+PAUSE time
+GOTO main

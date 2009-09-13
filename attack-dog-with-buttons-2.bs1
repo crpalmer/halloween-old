@@ -1,0 +1,197 @@
+' Baxter Big Dog
+'
+' One switch toggles between manual and auto modes.
+' In manual mode, two buttons select 3 different behaviours for the dog.
+' In auto mode, the three modes are picked randomly.
+'
+' The modes control 2 servos moving the head and tail.
+' A Scary Terry audio controller drives a servo for the mouth.
+'
+' Audio is played via an AP-8.
+'
+' The audio and movement is repeated a random number of times (the audio
+' is relatively short).
+'
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+' I/O definitions
+
+SYMBOL BUTTON1 = PIN0
+SYMBOL BUTTON2 = PIN1
+SYMBOL OVERRIDE = PIN2
+SYMBOL HEAD = 4
+SYMBOL TAIL = 5
+SYMBOL PIR = PIN6
+SYMBOL SIO = 7
+
+' Constants
+
+SYMBOL BAUD            = OT2400                ' baud jumper out
+SYMBOL AUDIO           = %00                   ' both address jumpers out
+
+' Variables
+
+SYMBOL x1 = B0                                 ' temporary used throughout
+SYMBOL playing = BIT7                          ' bit when temp is the AP-8 status
+SYMBOL eeprom_base = B1                        ' address of our current action in data table
+SYMBOL R = W1                                  ' random
+SYMBOL head_speed = B4                         ' current rate of movement for head
+SYMBOL head_to = B5                            ' current destination of the head
+SYMBOL tail_speed = B6                         ' current rate of movement for tail
+SYMBOL tail_to = B7                            ' current destination of the tail
+SYMBOL pirs = B8                               ' used to assure solid reading from the PIR (could be B0?)
+SYMBOL reps = B9                               ' number of reps left for the action
+SYMBOL head_at = B10                           ' current position of the head
+SYMBOL tail_at = B11                           ' current position of the tail
+
+' Reset our state and get ready for the next action
+
+start_waiting:
+
+head_at = 150
+tail_at = 150
+head_to = head_at
+tail_to = tail_at
+
+IF OVERRIDE = 1 THEN waiting0
+
+' If we are in auto mode then make sure we have a delay between triggers
+
+PAUSE 5000
+
+waiting0:
+
+pirs = 0
+
+waiting:
+
+RANDOM R               ' Keep the random number moving
+
+IF OVERRIDE = 1 THEN manual
+
+' Auto mode: if the PIR is low then reset the counter to 0.  If the PIR is high
+' then increment the counter.  When we have accumulated enough positives in a row
+' call it triggered.
+
+IF PIR = 0 THEN waiting0
+pirs = pirs + 1
+IF pirs <= 250 THEN waiting
+
+' Pick a random action and let is go
+
+eeprom_base = R // 3 * 5
+GOTO start
+
+manual:
+
+' Manual mode: two buttons control three actions.  If a button is pushed pause a
+' little bit to make it easier to hit both buttoms at the same time.
+
+eeprom_base = PINS & %11
+IF eeprom_base = 0 THEN waiting
+PAUSE 100
+eeprom_base = PINS & %11
+IF eeprom_base = 0 THEN waiting
+eeprom_base = eeprom_base - 1 * 5
+
+start:
+
+reps = R // 3 + 2
+
+' ================ main loop ===================
+' Play audio
+' Repeat until the audio is done (and head is reset)
+'     if head is at destionation, pick new destination
+'     if tail is at destination, pick new destination
+'     move head and tail
+
+rep:
+
+IF reps = 0 THEN start_waiting
+reps = reps - 1
+
+x1 = eeprom_base + 4
+READ x1, x1
+SEROUT SIO, BAUD, ("!AP8", AUDIO, "P", x1)
+
+playing_loop:
+
+' Head position
+
+IF head_at = head_to THEN new_head
+head_at = head_at + head_speed
+GOTO handle_tail
+
+' Head is at target, pick a new target in the opposite direction.
+
+new_head:
+
+READ eeprom_base, head_speed
+x1 = eeprom_base + 1
+READ x1, head_to
+
+RANDOM R
+head_to = R // head_to + head_to / 2 + 1 MAX head_to
+head_to = head_to * head_speed + 150
+IF head_at < 150 THEN head_high
+head_speed = - head_speed
+head_to = 300 - head_to   ' 150 - (head_to - 150)
+head_high:
+'DEBUG "HH ", #head_to, " ", #head_speed, " ", #head_at, CR
+
+' Tail position
+
+handle_tail:
+
+IF tail_at = tail_to THEN new_tail
+tail_at = tail_at + tail_speed
+GOTO send_pulse
+
+' Tail is at target, pick a new target in the opposite direction.
+
+new_tail:
+
+x1 = eeprom_base + 2
+READ x1, tail_speed
+x1 = x1 + 1
+READ x1, tail_to
+
+RANDOM R
+tail_to = R // tail_to + tail_to / 2 + 1 MAX tail_to
+tail_to = tail_to * tail_speed + 150
+IF tail_at < 150 THEN tail_high
+tail_speed = - tail_speed
+tail_to = 300 - tail_to   ' 150 - (tail_to - 150)
+tail_high:
+'DEBUG "TT ", #tail_to, " ", #tail_speed, " ", #tail_at, CR
+
+' Send the positions to the servos
+
+send_pulse:
+
+'DEBUG #head_at, " ", #tail_at, CR
+PULSOUT HEAD, head_at
+PULSOUT TAIL, tail_at
+PAUSE 18
+
+' Check to see if the audio is finished
+
+SEROUT SIO, BAUD, ("!AP8", AUDIO, "G")       ' get status
+SERIN  SIO, BAUD, x1
+
+IF playing = 0 AND head_at = 150 THEN rep
+GOTO playing_loop
+
+' Movement is controlled by the following table.  The head and tail
+' I ran out of room so I had to simplify movement somewhat from what I wanted.
+' For a given action, the head and tail always move with the same increment (speed)
+' each loop.  Random we pick how many steps of that size we take.
+'
+' That is, speed is the rate at which it moves and speed*steps is the maximum
+' movement that can be made.
+
+       ' head-speed   head-steps   tail-speed   tail-steps    track
+EEPROM (     5,            7,         1,           2,         6  )   'whine
+EEPROM (    20,            4,         3,           1,         7  )   'attack
+EEPROM (    30,            2,         20,          3,         5  )   'happy

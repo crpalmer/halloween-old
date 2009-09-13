@@ -1,0 +1,132 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL RX     = 7
+SYMBOL TX     = 6
+SYMBOL PIR    = PIN5
+SYMBOL LIGHTS = PIN0
+
+SYMBOL N_RANDOM_TRACKS = 6
+SYMBOL N_RESERVED_TRACKS = 3
+SYMBOL BAUD = OT2400
+
+SYMBOL R = W0
+SYMBOL track = B2
+SYMBOL old0 = B3
+SYMBOL old1 = B4
+SYMBOL old2 = B5
+SYMBOL i = W4
+SYMBOL p = W5
+
+PINS = %00000000                              ' clear all outputs
+DIRS = %00000011                              ' make P0,1 outputs
+
+' main loop: wait, intro, random, finale, pause
+
+Reset:
+
+  DEBUG "Waiting for VMUSIC2 to initialize", CR
+  PAUSE 10000                                    ' let VMUSIC power up
+  GOSUB vmusic2_stop                                 ' stop if playing
+  GOSUB vmusic2_wait_prompt
+  SEROUT TX, BAUD, ("VSV ", 150, 13)                   ' set volume
+  GOSUB vmusic2_wait_prompt
+
+main:
+   DEBUG "Waiting for a customer", CR
+
+waiting_for_a_customer:
+   RANDOM R
+   i = i + 1 * PIR
+   IF i < 200 THEN waiting_for_a_customer
+
+  DEBUG "Found a customer", CR
+
+  ' INTRO
+  DEBUG "Pausing before turning on lights", CR
+  PAUSE 5000
+  DEBUG "Lights & Intro!", CR
+  track = 0
+  GOSUB vmusic2_play
+  GOSUB vmusic2_wait_start
+  LIGHTS = 1
+  GOSUB vmusic2_wait_prompt
+
+  ' ADVERTISE OUR WARES
+
+  RANDOM R
+  i = R // 3 + 3
+  DEBUG "Advertising ", #i, CR
+
+  more_random_tracks:
+    RANDOM R
+    track = R // N_RANDOM_TRACKS + N_RESERVED_TRACKS
+    DEBUG "Consider ", #track, " when ", #old0, ", ", #old1, ", ", #old2, CR
+    IF track = old0 THEN more_random_tracks
+    IF track = old1 THEN more_random_tracks
+    IF track = old2 THEN more_random_tracks
+    RANDOM R
+    p = R // 4000 + 1500
+    DEBUG "Pause ", #p, CR
+    PAUSE p
+    old2 = old1
+    old1 = old0
+    old0 = track
+    GOSUB vmusic2_play
+    GOSUB vmusic2_wait_start
+    GOSUB vmusic2_wait_prompt
+    i = i - 1
+    IF i <> 0 THEN more_random_tracks
+
+  ' FINALES
+
+  RANDOM R
+  track = R // 2 + 1
+  IF track = 1 THEN skip_sheep_pause
+  PAUSE 8000
+skip_sheep_pause:
+  DEBUG "Finale: ", #R, " gives ", #track, CR
+  GOSUB vmusic2_play
+  GOSUB vmusic2_wait_start
+  GOSUB vmusic2_wait_prompt
+
+  DEBUG "Lights off", CR
+  LIGHTS = 0
+  PAUSE 5000
+
+  DEBUG "In between shows", CR
+  PAUSE 10000
+  GOTO main
+
+
+' ------------------- utilities --------------------
+
+vmusic2_play:
+  SEROUT TX, BAUD, ("VPF ")                     ' send play command
+  SEROUT TX, BAUD, (#track, ".MP3", 13)
+  RETURN
+
+' -------------------------------------------------------------------------
+
+vmusic2_wait_start:
+  SERIN RX, BAUD, ("T $")
+  RETURN
+
+' -------------------------------------------------------------------------
+
+vmusic2_stop:
+  SEROUT TX, BAUD, ("VST", 13)
+  RETURN
+
+' -------------------------------------------------------------------------
+
+vmusic2_wait_prompt:
+  SERIN RX, BAUD, (">")
+  RETURN
+
+' -------------------------------------------------------------------------
+
+vmusic2_debug:
+  SERIN RX, BAUD, old0
+  DEBUG "Got: ", #old0, CR
+  GOTO vmusic2_debug
