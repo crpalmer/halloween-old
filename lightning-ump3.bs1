@@ -1,0 +1,128 @@
+' {$STAMP BS1}
+' -----[ I/O Definitions ]-------------------------------------------------
+
+SYMBOL  RX              = 7                     ' SETUP = UP, no ULN
+SYMBOL  TX              = 6                     ' SETUP = UP, no ULN
+SYMBOL  strike          = PIN0
+
+' -----[ Constants ]-------------------------------------------------------
+
+SYMBOL  Baud            = OT2400                 'Prop-1 speed
+
+SYMBOL  IsOn            = 1
+SYMBOL  IsOff           = 0
+
+SYMBOL  VolMax          = 0
+SYMBOL  VolMin          = $FE
+
+' -----[ Variables ]-------------------------------------------------------
+
+SYMBOL  bolts           = B0
+SYMBOL  flashes         = B1
+SYMBOL  lottery         = W1
+SYMBOL  delay           = W2
+SYMBOL  mute            = B6
+SYMBOL  theMP3          = B7
+SYMBOL  eePntr          = W4
+SYMBOL  idx             = B10
+SYMBOL  char            = B11
+
+' -----[ Initialization ]--------------------------------------------------
+
+Reset:
+  PINS = %00000000                              ' preset IOs
+  DIRS = %00000001                              ' set output pins (1s)
+
+  PAUSE 2500
+
+' -----[ Program Code ]----------------------------------------------------
+
+Main:
+  RANDOM lottery
+  bolts = lottery // 3 + 2
+
+  RANDOM lottery
+  theMP3 = lottery // 3
+  GOSUB VM_Play
+  GOSUB VM_Wait_Start
+  PAUSE 100
+
+a_bolt:
+    RANDOM lottery
+    flashes = lottery // 2 + 1
+    IF theMP3 <> 0 THEN a_flash
+    flashes = 5
+a_flash:
+    strike = IsOn
+    RANDOM lottery
+    delay = lottery // 201 + 50
+    PAUSE delay
+    strike = IsOff
+    RANDOM lottery
+    delay = lottery // 51 + 50                ' on delay 1/3 to 1 sec
+    PAUSE delay
+    flashes = flashes - 1
+    IF flashes > 0 THEN a_flash
+    RANDOM lottery
+    delay = lottery // 1001 + 100
+    bolts = bolts - 1
+    IF bolts > 0 THEN a_bolt
+
+  RANDOM lottery
+  delay = lottery // 10000 + 10000
+  delay = 5000
+  PAUSE delay
+  GOTO Main
+
+VM_Wait_Prompt:
+  SERIN RX, Baud, (">")
+  RETURN
+
+' -------------------------------------------------------------------------
+
+' Pass file # (index in EEPROM table) to play in "theMP3"
+
+VM_Play:
+  SEROUT TX, Baud, ("VPF ")
+  GOTO Play_MP3
+
+' -------------------------------------------------------------------------
+
+' Pass file # (index in EEPROM table) to play in "theMP3"
+
+VM_Repeat:
+ SEROUT TX, Baud, ("VRF ")
+
+' -------------------------------------------------------------------------
+
+Play_MP3:
+  char = theMP3 + "0"
+  SEROUT TX, Baud, (char)
+
+Finish_Cmd:
+  SEROUT TX, Baud, (".MP3", 13)                 ' send extention + CR
+  RETURN
+
+' -------------------------------------------------------------------------
+
+VM_Wait_Start :
+  SERIN RX, Baud, ("T $")
+  RETURN
+
+' -------------------------------------------------------------------------
+
+VM_Stop:
+  SEROUT TX, Baud, ("VST", 13)
+  RETURN
+
+' -------------------------------------------------------------------------
+
+' Pass mute (0 = loudest, 254 = muted) in "mute"
+
+VM_Mute:
+  mute = mute MAX VolMin                        ' limit per spec
+  SEROUT TX, Baud, ("VSV ", #mute, 13)
+  RETURN
+
+
+' -----[ User Data ]-------------------------------------------------------
