@@ -4,6 +4,10 @@
 SYMBOL servo = PIN0
 SYMBOL signal = W0
 SYMBOL i = B11
+
+SYMBOL slowest = 155
+SYMBOL fastest = 170
+
 ' W6 = B12/13 used for subroutine calls
 
 ' PULSOUT sends a signal in units of 10us
@@ -21,16 +25,26 @@ SYMBOL i = B11
 '   ? not sending any signal causes it to do nothing?
 '   ? servo seems to not be exactly centered
 
-signal = 160
+signal = slowest
 
-main:
+speedup:
+
+FOR i = 1 TO 255 
+    GOSUB servo_cmd
+NEXT
+
+signal = signal + 1
+IF signal <= fastest THEN speedup
+
+slowdown:
 
 FOR i = 1 TO 255
     GOSUB servo_cmd
 NEXT
 
-signal = signal + 5 MAX 200
-GOTO main
+signal = signal - 1
+IF signal >= slowest THEN slowdown
+GOTO speedup
 
 servo_cmd:
   PULSOUT servo, signal
