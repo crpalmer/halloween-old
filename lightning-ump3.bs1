@@ -33,7 +33,8 @@ Reset:
   PINS = %00000000                              ' preset IOs
   DIRS = %00000001                              ' set output pins (1s)
 
-  PAUSE 2500
+  PAUSE 2000
+  SEROUT TX, Baud, ("ST V 0", 13, "ST R 10", 13)
 
 ' -----[ Program Code ]----------------------------------------------------
 
@@ -42,16 +43,16 @@ Main:
   bolts = lottery // 3 + 2
 
   RANDOM lottery
-  theMP3 = lottery // 3
-  GOSUB VM_Play
-  GOSUB VM_Wait_Start
-  PAUSE 100
+  theMP3 = lottery // 3 + "0"
+  SEROUT TX, Baud, ("PC F t", theMP3, ".MP3", 13)
+waiting:
+  GOSUB get_status
+  IF CHAR = "S" THEN waiting
 
 a_bolt:
     RANDOM lottery
     flashes = lottery // 2 + 1
-    IF theMP3 <> 0 THEN a_flash
-    flashes = 5
+
 a_flash:
     strike = IsOn
     RANDOM lottery
@@ -68,61 +69,17 @@ a_flash:
     bolts = bolts - 1
     IF bolts > 0 THEN a_bolt
 
-  RANDOM lottery
-  delay = lottery // 10000 + 10000
-  delay = 5000
-  PAUSE delay
-  GOTO Main
+still_playing:
+    GOSUB get_status
+    IF char = "P" THEN still_playing
 
-VM_Wait_Prompt:
-  SERIN RX, Baud, (">")
-  RETURN
+    RANDOM lottery
+    delay = lottery // 10000 + 10000
+    delay = 5000
+    PAUSE delay
+    GOTO Main
 
-' -------------------------------------------------------------------------
-
-' Pass file # (index in EEPROM table) to play in "theMP3"
-
-VM_Play:
-  SEROUT TX, Baud, ("VPF ")
-  GOTO Play_MP3
-
-' -------------------------------------------------------------------------
-
-' Pass file # (index in EEPROM table) to play in "theMP3"
-
-VM_Repeat:
- SEROUT TX, Baud, ("VRF ")
-
-' -------------------------------------------------------------------------
-
-Play_MP3:
-  char = theMP3 + "0"
-  SEROUT TX, Baud, (char)
-
-Finish_Cmd:
-  SEROUT TX, Baud, (".MP3", 13)                 ' send extention + CR
-  RETURN
-
-' -------------------------------------------------------------------------
-
-VM_Wait_Start :
-  SERIN RX, Baud, ("T $")
-  RETURN
-
-' -------------------------------------------------------------------------
-
-VM_Stop:
-  SEROUT TX, Baud, ("VST", 13)
-  RETURN
-
-' -------------------------------------------------------------------------
-
-' Pass mute (0 = loudest, 254 = muted) in "mute"
-
-VM_Mute:
-  mute = mute MAX VolMin                        ' limit per spec
-  SEROUT TX, Baud, ("VSV ", #mute, 13)
-  RETURN
-
-
-' -----[ User Data ]-------------------------------------------------------
+get_status:
+    SEROUT TX, Baud, ("PC Z", 13)                 ' request status
+    SERIN  RX, Baud, char                         ' will be "S" or "P"
+    RETURN
