@@ -1,52 +1,44 @@
 ' {$STAMP BS1}
 ' {$PBASIC 1.0}
 
-SYMBOL servo = PIN0
+SYMBOL servo1 = 0
+SYMBOL servo2 = 1
+SYMBOL servo3 = 2
+SYMBOL servo4 = 3
+SYMBOL gofast = PIN4
 SYMBOL signal = W0
-SYMBOL i = B11
+SYMBOL isfast = B2
+SYMBOL i = B3
 
-SYMBOL slowest = 155
-SYMBOL fastest = 170
+SYMBOL slow = 152
+SYMBOL fast = 160
 
-' W6 = B12/13 used for subroutine calls
+PULSOUT servo1, slow
+PAUSE 20
+PULSOUT servo1, slow
+PULSOUT servo2, slow
+PAUSE 20
+PULSOUT servo1, slow
+PULSOUT servo2, slow
+PULSOUT servo3, slow
+PAUSE 20
 
-' PULSOUT sends a signal in units of 10us
-'
-' Modified Servo:
-'   * 1.5ms (150 units) == stop
-'   * bigger means speed left
-'   * smaller means speed right
-'   * on my one servo 152 was actually stop
-'
-' Unmodified Servo:
-'   * 1.5ms (150 units) == center position
-'   * 2.5ms (250 units) == 90 degrees left
-'   * 0.5ms ( 50 units) == 90 degrees right
-'   ? not sending any signal causes it to do nothing?
-'   ? servo seems to not be exactly centered
+signal = slow
+main:
 
-signal = slowest
+  IF gofast = 1 THEN dofast
+  IF signal <= slow THEN pulse
+  signal = signal - 1
+  GOTO pulse
+dofast:
+  signal = fast
 
-speedup:
-
-FOR i = 1 TO 255 
-    GOSUB servo_cmd
-NEXT
-
-signal = signal + 1
-IF signal <= fastest THEN speedup
-
-slowdown:
-
-FOR i = 1 TO 255
-    GOSUB servo_cmd
-NEXT
-
-signal = signal - 1
-IF signal >= slowest THEN slowdown
-GOTO speedup
-
-servo_cmd:
-  PULSOUT servo, signal
-  PAUSE 20
-  RETURN
+pulse:
+  FOR i = 1 TO 25
+    PULSOUT servo1, signal
+    PULSOUT servo2, signal
+    PULSOUT servo3, signal
+    PULSOUT servo4, signal
+    PAUSE 19
+  NEXT
+  GOTO main
