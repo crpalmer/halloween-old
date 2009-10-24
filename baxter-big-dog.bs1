@@ -132,7 +132,10 @@ GOTO start_waiting
 ' That is, speed is the rate at which it moves and speed*steps is the maximum
 ' movement that can be made.
 
-       ' head-speed   head-steps   tail-speed   tail-steps    20ms ticks
-EEPROM (    20,            4,         3,           1,         100 )   'attack
-EEPROM (    30,            2,         20,          3,         240 )   'happy
-EEPROM (     5,            7,         1,           2,         140 )   'whine
+       ' head-speed   head-steps   tail-speed   tail-steps    100ms ticks
+EEPROM (     5,            4,         4,           1,         137 )   'growl ending in a bark
+EEPROM (     1,           20,         1,           1,         52  )   'wolf howl
+EEPROM (    10,            4,        10,           3,         43 )    'growl
+EEPROM (     3,            3,         3,           3,         27 )    '2 barks
+EEPROM (     4,            3,        10,           3,         62 )    'attacking for a treat
+
