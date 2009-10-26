@@ -1,0 +1,115 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+'
+' Hayride
+' -------
+'
+' Haunted hayride from 2009.
+'
+' The driver is a scary terry driven talking skull that randomly
+' either just talks or else he says something about the creature
+' that pops up in the back (with lights turning on).
+'
+' The hayride has 4 wheels that are driven by servos and
+' controlled by the hayride-wheels.bs1 program which lets us
+' enable the wheels and then control either low or hide speed
+' on them
+
+SYMBOL RX     = 7            ' uMP3's T, pull down?
+SYMBOL TX     = 6            ' uMP3's R, pull down?
+SYMBOL PIR    = PIN5
+SYMBOL MANUAL = PIN4
+SYMBOL GOFAST = PIN3         ' Signal to make the wheels fast
+SYMBOL WHEELS = PIN2         ' Signal to enable the wheels
+SYMBOL LIGHTS = PIN1
+SYMBOL POPUP  = PIN0
+
+SYMBOL BAUD = OT2400
+
+' Audio files are just numbered 0 - N_TRACKS.  The first N_ATTACK
+' tracks cause the pop-up to pop.
+
+SYMBOL N_ATTACK = 2
+SYMBOL N_TRACKS = 4
+
+SYMBOL R = W0
+SYMBOL track = B4
+SYMBOL old0 = B5
+SYMBOL old1 = B6
+SYMBOL old2 = B7
+SYMBOL status = B9
+SYMBOL i = B10
+SYMBOL trigger = B11
+
+PINS = %00000000                              ' clear all outputs
+DIRS = %00001111                              ' make P0-3 outputs
+
+' main loop: wait, intro, random, finale, pause
+
+Reset:
+    GOSUB init_player
+    WHEELS = 1
+
+main:
+    PAUSE 5000
+
+waiting_for_a_customer:
+     RANDOM R
+     trigger = MANUAL + PIR
+     i = i + 1 * trigger
+     IF i < 100 THEN waiting_for_a_customer
+
+random_track:
+    RANDOM R
+    track = R // N_TRACKS
+    IF track = old0 THEN random_track
+    IF track = old1 THEN random_track
+    IF track = old2 THEN random_track
+    RANDOM R
+    old2 = old1
+    old1 = old0
+    old0 = track
+    DEBUG track
+    IF track >= N_ATTACK THEN play_track
+    DEBUG "attack", CR
+
+    GOFAST = 1
+    LIGHTS = 1
+    POPUP  = 1
+play_track:
+    GOSUB play
+wait_track:
+    RANDOM R
+    GOSUB get_status
+    IF status <> "S" THEN wait_track
+
+    GOFAST = 0
+    LIGHTS = 0
+    POPUP  = 0
+
+    GOTO main
+
+' ------------------- utilities --------------------
+
+init_player:
+    PAUSE 1000
+    SEROUT TX, Baud, ("PC S", 13)
+    RETURN
+
+play:
+    SEROUT TX, Baud, ("PC F ", #track, ".MP3", 13)
+    RETURN
+
+wait_done_playing:
+    GOSUB get_status
+    IF status <> "S" THEN wait_done_playing
+    RETURN
+
+get_status:
+    SEROUT TX, Baud, ("PC Z", 13)                 ' request status
+    SERIN  RX, Baud, status                       ' will be "S" or "P"
+    IF status = "S" THEN get_status_done
+    IF status <> "P" THEN get_status
+get_status_done:
+    RETURN
+  RETURN
