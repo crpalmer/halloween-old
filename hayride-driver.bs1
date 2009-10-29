@@ -1,4 +1,4 @@
-' {$STAMP BS1}
+' {$STAMP BS1}                                                                                         v
 ' {$PBASIC 1.0}
 '
 ' Hayride
@@ -26,20 +26,19 @@ SYMBOL POPUP  = PIN0
 
 SYMBOL BAUD = OT2400
 
-' Audio files are just numbered 0 - N_TRACKS.  The first N_ATTACK
-' tracks cause the pop-up to pop.
-
-SYMBOL N_ATTACK = 2
-SYMBOL N_TRACKS = 4
+SYMBOL N_ATTACK_TRACKS = 4
+SYMBOL N_TALK_TRACKS = 6
+SYMBOL ATTACK_EVERY = 5
 
 SYMBOL R = W0
+SYMBOL i = W1
 SYMBOL track = B4
+SYMBOL n_tracks = B4
 SYMBOL old0 = B5
 SYMBOL old1 = B6
 SYMBOL old2 = B7
 SYMBOL status = B9
-SYMBOL i = B10
-SYMBOL trigger = B11
+SYMBOL attack = B10
 
 PINS = %00000000                              ' clear all outputs
 DIRS = %00001111                              ' make P0-3 outputs
@@ -51,43 +50,73 @@ Reset:
     WHEELS = 1
 
 main:
-    PAUSE 5000
+    i = 0
+    attack = "T"
+    n_tracks = N_TALK_TRACKS
 
-waiting_for_a_customer:
-     RANDOM R
-     trigger = MANUAL + PIR
-     i = i + 1 * trigger
-     IF i < 100 THEN waiting_for_a_customer
+inter_loop_with_override:
+    PAUSE 100
+    i = i + 100
+    IF MANUAL = 1 THEN manual_pushed
+    IF i < 5000 THEN inter_loop_with_override
+    i = 0
 
-random_track:
+waiting:
     RANDOM R
-    track = R // N_TRACKS
-    IF track = old0 THEN random_track
-    IF track = old1 THEN random_track
-    IF track = old2 THEN random_track
+    PAUSE 10
+    IF MANUAL = 1 THEN manual_pushed
+    i = i + 10 * PIR
+    IF i < 50 THEN waiting
+
+    i = R // ATTACK_EVERY
+    IF i <> 0 THEN pick_a_track
+    attack = "A"
+    n_tracks = N_ATTACK_TRACKS
+
+pick_a_track:
     RANDOM R
+    track = R // n_tracks
+    IF track = old0 THEN pick_a_track
+    IF track = old1 THEN pick_a_track
+    IF track = old2 THEN pick_a_track
     old2 = old1
     old1 = old0
     old0 = track
-    DEBUG track
-    IF track >= N_ATTACK THEN play_track
-    DEBUG "attack", CR
+    IF attack <> "A" THEN play_track
 
     GOFAST = 1
-    LIGHTS = 1
     POPUP  = 1
+
 play_track:
     GOSUB play
+
 wait_track:
     RANDOM R
     GOSUB get_status
-    IF status <> "S" THEN wait_track
+    IF status = "S" THEN done
+    IF status <> "P" THEN wait_track
+    IF attack <> "A" THEN wait_track
+    RANDOM R
+    i = R // 125 + 50
+    PAUSE i
+    LIGHTS = 0
+    RANDOM R
+    i = R // 125 + 50
+    PAUSE i
+    LIGHTS = 1
+    GOTO wait_track
 
+
+done:
     GOFAST = 0
     LIGHTS = 0
     POPUP  = 0
 
     GOTO main
+
+manual_pushed:
+    attack = "A"
+    GOTO pick_a_track
 
 ' ------------------- utilities --------------------
 
@@ -97,7 +126,7 @@ init_player:
     RETURN
 
 play:
-    SEROUT TX, Baud, ("PC F ", #track, ".MP3", 13)
+    SEROUT TX, Baud, ("PC F ", attack, #track, ".MP3", 13)
     RETURN
 
 wait_done_playing:
