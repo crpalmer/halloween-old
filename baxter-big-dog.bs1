@@ -1,4 +1,4 @@
-' {$STAMP BS1}
+ ' {$STAMP BS1}
 ' {$PBASIC 1.0}
 
 ' I/O definitions
@@ -26,7 +26,7 @@ SYMBOL head_to = B5                            ' current destination of the head
 SYMBOL tail_speed = B6                         ' current rate of movement for tail
 SYMBOL tail_to = B7                            ' current destination of the tail
 SYMBOL pirs = B8                               ' used to assure solid reading from the PIR (could be B0?)
-SYMBOL reps = B9                               ' number of reps left for the action
+SYMBOL reps = W4                               ' number of reps left for the action
 SYMBOL head_at = B10                           ' current position of the head
 SYMBOL tail_at = B11                           ' current position of the tail
 
@@ -40,26 +40,25 @@ head_to = head_at
 tail_to = tail_at
 pirs = 0
 
-PAUSE 5000
+PAUSE 15000
 
 waiting:
 
 RANDOM R               ' Keep the random number moving
-
-pirs = pirs + 1 * PIR
-IF pirs <= 250 THEN waiting
+PAUSE 10
+pirs = pirs + 10 * PIR
+IF pirs < 50 THEN waiting
 
 ' Pick a random action and let it go
 
 x1 = R // N_ACTIONS
-x1 = 2
 eeprom_base = x1 * ACTION_ENTRY_BYTES
-x1 = x1 + "0"
-SEROUT TX, Baud, ("VPF ", x1, ".mp3", 13)
+SEROUT TX, Baud, ("VPF ", #x1, ".mp3", 13)
 
 x1 = eeprom_base + 4
 READ x1, reps
-
+reps = reps * 5
+DEBUG reps
 playing_loop:
 
 ' Head position
@@ -133,9 +132,8 @@ GOTO start_waiting
 ' movement that can be made.
 
        ' head-speed   head-steps   tail-speed   tail-steps    100ms ticks
-EEPROM (     5,            4,         4,           1,         137 )   'growl ending in a bark
-EEPROM (     1,           20,         1,           1,         52  )   'wolf howl
-EEPROM (    10,            4,        10,           3,         43 )    'growl
-EEPROM (     3,            3,         3,           3,         27 )    '2 barks
-EEPROM (     4,            3,        10,           3,         62 )    'attacking for a treat
-
+EEPROM (     5,            4,         4,           1,         100 )   'growl ending in a bark
+EEPROM (     1,           20,         1,           1,         45  )   'wolf howl
+EEPROM (    10,            4,        10,           3,         32 )    'growl
+EEPROM (     3,            3,         3,           3,         20 )    '2 barks
+EEPROM (     4,            3,        10,           3,         46 )    'attacking for a treat

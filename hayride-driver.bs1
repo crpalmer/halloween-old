@@ -27,13 +27,13 @@ SYMBOL POPUP  = PIN0
 SYMBOL BAUD = OT2400
 
 SYMBOL N_ATTACK_TRACKS = 4
-SYMBOL N_TALK_TRACKS = 6
-SYMBOL ATTACK_EVERY = 5
+SYMBOL N_TALK_TRACKS = 10
+SYMBOL ATTACK_EVERY = 10
 
 SYMBOL R = W0
 SYMBOL i = W1
 SYMBOL track = B4
-SYMBOL n_tracks = B4
+SYMBOL n_tracks = B11
 SYMBOL old0 = B5
 SYMBOL old1 = B6
 SYMBOL old2 = B7
@@ -48,6 +48,7 @@ DIRS = %00001111                              ' make P0-3 outputs
 Reset:
     GOSUB init_player
     WHEELS = 1
+    R = 1031
 
 main:
     i = 0
@@ -95,7 +96,11 @@ wait_track:
     GOSUB get_status
     IF status = "S" THEN done
     IF status <> "P" THEN wait_track
-    IF attack <> "A" THEN wait_track
+    IF attack = "A" THEN toggle_attack
+    IF manual = 0 THEN wait_track
+    POPUP = 1
+    LIGHTS = 1
+    toggle_attack:
     RANDOM R
     i = R // 125 + 50
     PAUSE i
@@ -126,7 +131,7 @@ init_player:
     RETURN
 
 play:
-    SEROUT TX, Baud, ("PC F ", attack, #track, ".MP3", 13)
+    SEROUT TX, Baud, ("PC F ", attack, #track, ".mp3", 13)
     RETURN
 
 wait_done_playing:
@@ -135,10 +140,10 @@ wait_done_playing:
     RETURN
 
 get_status:
+    PAUSE 100
     SEROUT TX, Baud, ("PC Z", 13)                 ' request status
     SERIN  RX, Baud, status                       ' will be "S" or "P"
     IF status = "S" THEN get_status_done
     IF status <> "P" THEN get_status
 get_status_done:
     RETURN
-  RETURN
