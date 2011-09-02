@@ -43,13 +43,13 @@ PUB OneSetOfEyes(start) | seed, P, eye
   outa[start]~~
   dira[start+8]~~
   outa[start+8]~~
-  dira[start+24]~~
-  outa[start+24]~~
+  dira[start+16]~~
+  outa[start+16]~~
 
   repeat                                     ' Endless loop
     ?seed
     P := ||seed
-    eye := (P // 4)*8 + start
+    eye := (P // 3)*8 + start
     P := P // (MAX_TIME_BETWEEN_BLINKS - MIN_TIME_BETWEEN_BLINKS + 1) + MIN_TIME_BETWEEN_BLINKS
     waitcnt(clkfreq / 1000 * P + cnt)
     outa[eye] := 0
