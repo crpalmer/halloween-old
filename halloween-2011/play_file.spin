@@ -22,7 +22,7 @@ PUB start(sd_p0, audio_p0, volume) | check
     reboot
 
   dac.changeLeftChannelVolume(volume)
-  dac.changeRightChannelVolume(volume)  
+  dac.changeRightChannelVolume(volume)                              
 
 PUB sampleAddress
   return dac.sampleAddress
@@ -69,9 +69,11 @@ PUB synchronously(stringPointer) | numberOfChannels, sampleRate
       return string("Wav file corrupt")    
 
     fat.changeFilePosition(36)
-      
-    if(fat.readLong <> $61_74_61_64)
-      return string("No DATA") 
+
+    ' There may be other sections of information, such as the LIST section.
+    ' Skip over the sections until we hit the DATA section.
+    while fat.readLong <> $61_74_61_64
+      fat.changeFilePosition(\fat.checkFilePosition + fat.readLong)  
 
 '   com.str(string("Now playing "))
 '   com.str(stringPointer)
