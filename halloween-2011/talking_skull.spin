@@ -17,7 +17,7 @@ OBJ
 PUB start(addr, servo, eyes)
     cognew(background_worker(addr, @position), @stack)
     cognew(background_servo(@position, servo, eyes), @stack2)
-    cognew(background_printer, @stack3)
+    cognew(background_printer(addr), @stack3)
     
 PUB start_moving(_max)
     moving := 1
@@ -56,8 +56,16 @@ PUB background_servo(addr, servo, eyes) | us, x
     outa[servo] := 0
     waitcnt(x)
 
-PUB background_printer
+PUB background_printer(sample_addr) | x
     debug.start(115_200)
+    repeat
+      if moving
+        x := LONG[sample_addr]
+        || x
+        debug.dec(x)
+        debug.str(STRING(" "))
+        waitcnt(cnt + clkfreq / 10)
+        
     repeat
       if moving
         'debug.str(STRING("("))

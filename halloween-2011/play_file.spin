@@ -2,7 +2,6 @@ CON
   NO_WORKER = 255
   
 VAR
-  byte                worker
   
 OBJ
 
@@ -26,9 +25,9 @@ PUB start(sd_p0, audio_p0, volume) | check
 
 PUB sampleAddress
   return dac.sampleAddress
-  
-PUB synchronously(stringPointer) | numberOfChannels, sampleRate
 
+PUB synchronously(stringPointer) | numberOfChannels, sampleRate, x
+    
     fat.openFile(stringPointer, "R")
 
     if(fat.readLong <> $46_46_49_52)
@@ -57,8 +56,10 @@ PUB synchronously(stringPointer) | numberOfChannels, sampleRate
     fat.changeFilePosition(34)
     result := fat.readShort
 
-    dac.changeBitsPerSample(result)    
-    dac.changeSampleSign(result == 16)
+    if result <> 16
+      return STRING("We only support 16-bit samples")
+      
+    dac.changeSampleSign(true)
 
     fat.changeFilePosition(28)
 
@@ -72,20 +73,16 @@ PUB synchronously(stringPointer) | numberOfChannels, sampleRate
 
     ' There may be other sections of information, such as the LIST section.
     ' Skip over the sections until we hit the DATA section.
-    while fat.readLong <> $61_74_61_64
+    repeat while fat.readLong <> $61_74_61_64
       fat.changeFilePosition(\fat.checkFilePosition + fat.readLong)  
 
-'   com.str(string("Now playing "))
-'   com.str(stringPointer)
-
-    dac.clearData 
+    dac.clearData
     dac.startPlayer
   
     repeat (fat.readLong / 512)
-      fat.readData(dac.transferData, 512)
+      fat.readData(\dac.transferData, 512)
 
     dac.stopPlayer
- '  com.str(string("... End of File."))
     fat.closeFile
 
     return -1   
