@@ -20,14 +20,11 @@ PUB start(sd_p0, audio_p0, volume) | check
   if check < 0
     reboot
 
-  dac.changeLeftChannelVolume(volume)
-  dac.changeRightChannelVolume(volume)                              
-
 PUB sampleAddress
   return dac.sampleAddress
 
-PUB synchronously(stringPointer) | numberOfChannels, sampleRate, x
-    
+PUB synchronously(stringPointer) | numberOfChannels, sampleRate
+
     fat.openFile(stringPointer, "R")
 
     if(fat.readLong <> $46_46_49_52)
@@ -48,8 +45,8 @@ PUB synchronously(stringPointer) | numberOfChannels, sampleRate, x
     if(fat.readShort <> 1)
       return string("Not LPCM file")
 
-    numberOfChannels := fat.readShort  
-    dac.changeNumberOfChannels(numberOfChannels)
+    numberOfChannels := fat.readShort
+\   dac.changeNumberOfChannels(numberOfChannels)
     sampleRate := fat.readLong
     dac.changeSampleRate(sampleRate)
     
@@ -59,8 +56,6 @@ PUB synchronously(stringPointer) | numberOfChannels, sampleRate, x
     if result <> 16
       return STRING("We only support 16-bit samples")
       
-    dac.changeSampleSign(true)
-
     fat.changeFilePosition(28)
 
     if(fat.readLong <> (sampleRate * numberOfChannels * result / 8))
@@ -74,13 +69,13 @@ PUB synchronously(stringPointer) | numberOfChannels, sampleRate, x
     ' There may be other sections of information, such as the LIST section.
     ' Skip over the sections until we hit the DATA section.
     repeat while fat.readLong <> $61_74_61_64
-      fat.changeFilePosition(\fat.checkFilePosition + fat.readLong)  
+      fat.changeFilePosition(fat.readLong + fat.checkFilePosition)
 
     dac.clearData
     dac.startPlayer
-  
-    repeat (fat.readLong / 512)
-      fat.readData(\dac.transferData, 512)
+
+    repeat (fat.readLong / 512) ' fat.readLong / 512)
+       fat.readData(\dac.transferData, 512)
 
     dac.stopPlayer
     fat.closeFile
