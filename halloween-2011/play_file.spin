@@ -8,7 +8,7 @@ OBJ
   fat: "SD2.0_FATEngine.spin"
   dac: "PCM2.1_DACEngine.spin"
 
-PUB start(sd_p0, audio_p0, volume) | check
+PUB start(sd_p0, audio_p0) | check
 
   ifnot(fat.FATEngineStart(sd_p0, sd_p0+1, sd_p0+2, sd_p0+3))
     reboot
@@ -23,7 +23,7 @@ PUB start(sd_p0, audio_p0, volume) | check
 PUB sampleAddress
   return dac.sampleAddress
 
-PUB synchronously(stringPointer) | numberOfChannels, sampleRate
+PUB synchronously(stringPointer, numTracksToPlay) | numberOfChannels, sampleRate
 
     fat.openFile(stringPointer, "R")
 
@@ -47,6 +47,7 @@ PUB synchronously(stringPointer) | numberOfChannels, sampleRate
 
     numberOfChannels := fat.readShort
 \   dac.changeNumberOfChannels(numberOfChannels)
+    dac.changeNumberOfTracksToPlay(numTracksToPlay)
     sampleRate := fat.readLong
     dac.changeSampleRate(sampleRate)
     
