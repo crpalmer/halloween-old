@@ -13,12 +13,12 @@ CON
   MIN_INTER_WAIT = 5000
   MAX_INTER_WAIT = 20000
   
-  SD_P0 = 16
-  AUDIO_P0 = 22
-  MOUTH_SERVO = 7
-  HEAD_SERVO = 6
-  TAIL_SERVO = 5
-  LEDS = 4
+  SD_P0 = 12
+  AUDIO_P0 = 24
+  MOUTH_SERVO = 4
+  HEAD_SERVO = 5
+  TAIL_SERVO = 6
+  LEDS = 3
   PIR = 0
   
 OBJ
@@ -36,27 +36,27 @@ VAR
   
 PUB Baxter | check, P, seed, this, last, last2, ms, pir_passes
 
+  'debug.start(250000)
+  
   ByteMove(@filename, STRING("00.wav"), 7)
 
   play_file.start(SD_P0, AUDIO_P0)
-  skull.start(700, 1200, play_file.sampleAddress, MOUTH_SERVO, LEDS, 1)
+  skull.start(500, 1000, play_file.sampleAddress, MOUTH_SERVO, LEDS, 1)
   cognew(background_mover(HEAD_SERVO, @head_speed, @head_range), @head_stack)
   cognew(background_mover(TAIL_SERVO, @tail_speed, @tail_range), @tail_stack)
 
   seed := 1234567
   ms := clkfreq / 1000
 
-  'debug.start(250000)
-  
   repeat
     pir_passes := 0
-    repeat
-      if ina[PIR] == 0
-        pir_passes := 0
-      else
-        pir_passes ++
-      waitcnt(cnt + ms)
-    until pir_passes > 100
+'    repeat
+'      if ina[PIR] == 0
+'        pir_passes := 0
+'      else
+'        pir_passes ++
+'      waitcnt(cnt + ms)
+'    until pir_passes > 100
     
     repeat
       ?seed
@@ -84,7 +84,8 @@ PUB Baxter | check, P, seed, this, last, last2, ms, pir_passes
     tail_speed := 0
     ?seed
     P := ||seed
-    P := P // (MAX_INTER_WAIT - MIN_INTER_WAIT) + MIN_INTER_WAIT 
+    P := P // (MAX_INTER_WAIT - MIN_INTER_WAIT) + MIN_INTER_WAIT
+    P := 500 
     waitcnt(cnt + ms * P)
 
 PRI background_mover(servo, speed_addr, range_addr) | position, dir, speed, range, us, x, seed
