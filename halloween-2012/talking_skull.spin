@@ -1,7 +1,6 @@
 CON
 
 VAR
-    long              moving
     long              position
     long              stack[32], stack2[32], stack3[32]
 
@@ -15,7 +14,7 @@ OBJ
 PUB start(min_pos, range, addr, servo, eyes, sample_track)
     cognew(background_worker(eyes, min_pos, range, addr, @position, sample_track), @stack)
     cognew(background_servo(@position, servo), @stack2)
-    'cognew(background_printer(addr), @stack3)
+    'cognew(background_printer, @stack3)
 
 PUB background_worker(eyes, min_pos, range, sample_addr, position_addr, sample_track) | x,y
   dira[eyes] := 1
@@ -39,13 +38,9 @@ PUB background_servo(addr, servo) | us, x
     outa[servo] := 0
     waitcnt(x)
 
-PUB background_printer(sample_addr) | x
-    debug.start(115_200)
+PUB background_printer
+    debug.start(250_000)
     repeat
-      x := LONG[sample_addr][2]
-      ||x
-      if moving
-      
-        debug.dec(position)
-        debug.str(string(" "))
+      debug.dec(position)
+      debug.str(string(" "))
       
