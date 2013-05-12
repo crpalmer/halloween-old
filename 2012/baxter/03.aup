@@ -1,0 +1,81 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="03_data" version="1.3.0" audacityversion="1.3.13-beta" sel0="0.1238317091" sel1="6.4167115277" vpos="0" h="0.0000000000" zoom="177.6604729730" rate="22050.0">
+	<tags>
+		<tag name="GENRE" value="Blues"/>
+	</tags>
+	<wavetrack name="baxter-happy" channel="2" linked="0" mute="0" solo="1" height="150" minimized="0" rate="22050" gain="0.223872" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="149184">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000bb8.au" len="149184" min="-1.617831" max="1.658699" rms="0.30896"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="Audio Track" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" rate="22050" gain="1.0" pan="0.0">
+		<waveclip offset="0.12380952">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="138758">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000420.au" len="138758" min="-1.0" max="1.0" rms="0.840851"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="53">
+				<controlpoint t="0.000005000000" val="0.013888888992"/>
+				<controlpoint t="0.067566753823" val="0.444444447756"/>
+				<controlpoint t="0.067571753823" val="1.000000000000"/>
+				<controlpoint t="0.230799461215" val="0.916666686535"/>
+				<controlpoint t="0.349002456224" val="0.500000000000"/>
+				<controlpoint t="0.484091593376" val="0.291666656733"/>
+				<controlpoint t="0.613552016480" val="0.402777791023"/>
+				<controlpoint t="0.714868869345" val="0.291666656733"/>
+				<controlpoint t="0.872472862689" val="0.486111104488"/>
+				<controlpoint t="1.007561999841" val="0.305555552244"/>
+				<controlpoint t="1.159537279138" val="0.388888895512"/>
+				<controlpoint t="1.215824419618" val="0.472222208977"/>
+				<controlpoint t="1.300255130338" val="0.333333343267"/>
+				<controlpoint t="1.429715553442" val="0.277777791023"/>
+				<controlpoint t="1.502888836067" val="0.972222208977"/>
+				<controlpoint t="1.637977973219" val="0.833333313465"/>
+				<controlpoint t="1.789953252515" val="0.125000000000"/>
+				<controlpoint t="2.009473100388" val="0.152777776122"/>
+				<controlpoint t="2.026359242532" val="0.986111104488"/>
+				<controlpoint t="2.161448379684" val="0.930555582047"/>
+				<controlpoint t="2.330309801125" val="0.263888895512"/>
+				<controlpoint t="2.499171222565" val="0.402777791023"/>
+				<controlpoint t="2.656775215910" val="0.250000000000"/>
+				<controlpoint t="2.701804928294" val="0.250000000000"/>
+				<controlpoint t="2.797493067110" val="0.361111104488"/>
+				<controlpoint t="2.904438634022" val="0.263888895512"/>
+				<controlpoint t="3.039527771175" val="0.277777791023"/>
+				<controlpoint t="3.101443625703" val="0.402777791023"/>
+				<controlpoint t="3.197131764519" val="0.222222223878"/>
+				<controlpoint t="3.371621900007" val="0.222222223878"/>
+				<controlpoint t="3.439166468584" val="1.000000000000"/>
+				<controlpoint t="3.557369463592" val="0.958333313465"/>
+				<controlpoint t="3.636171460264" val="0.638888895512"/>
+				<controlpoint t="3.692458600744" val="0.111111111939"/>
+				<controlpoint t="3.968265589097" val="0.083333335817"/>
+				<controlpoint t="3.990780445289" val="0.986111104488"/>
+				<controlpoint t="4.131498296489" val="0.930555582047"/>
+				<controlpoint t="4.193414151017" val="0.750000000000"/>
+				<controlpoint t="4.232815149354" val="0.319444447756"/>
+				<controlpoint t="4.441077569130" val="0.180555552244"/>
+				<controlpoint t="4.497364709610" val="1.000000000000"/>
+				<controlpoint t="4.643711274859" val="0.972222208977"/>
+				<controlpoint t="4.750656841771" val="0.472222208977"/>
+				<controlpoint t="4.913889549163" val="0.152777776122"/>
+				<controlpoint t="5.133409397036" val="0.152777776122"/>
+				<controlpoint t="5.212211393708" val="0.319444447756"/>
+				<controlpoint t="5.302270818476" val="0.208333328366"/>
+				<controlpoint t="5.488018382061" val="0.361111104488"/>
+				<controlpoint t="5.611850091117" val="0.208333328366"/>
+				<controlpoint t="5.752567942317" val="0.361111104488"/>
+				<controlpoint t="5.842627367086" val="1.000000000000"/>
+				<controlpoint t="6.056518500910" val="0.944444417953"/>
+				<controlpoint t="6.197236352111" val="0.055555555969"/>
+			</envelope>
+		</waveclip>
+	</wavetrack>
+</project>
