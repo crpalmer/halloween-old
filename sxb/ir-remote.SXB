@@ -1,0 +1,132 @@
+DEVICE          SX28, OSCHS1, TURBO, STACKX, OPTIONX, BOR42
+FREQ            4_000_000
+
+irPulse        VAR     Word                  ' Stores pulse widths
+remoteCode     VAR     Byte                  ' Stores remote code
+temp1	       VAR     Word
+temp2	       VAR 	Word
+temp3		VAR	Byte
+temp4		VAR	Byte
+temp5		VAR	Byte
+p1	       VAR	Word
+p2		VAR 	Word
+p3		VAR	Word
+
+LCD_INT	       SUB     2
+LCD_STR		SUB	2			' send string to LCD
+
+LCD	PIN	RC.0
+IR_IN	PIN	RC.1
+
+PROGRAM start
+
+start:
+
+serout lcd, t19200, $0C
+pause 100
+serout lcd, t19200, $11
+pause 50
+
+serout lcd, t19200, 13
+lcd_str "                                                               "
+serout lcd, t19200, 13
+
+DO                                           ' Main DO...LOOP
+  remoteCode = 0
+
+  DO  
+    PULSIN IR_IN, 1, irPulse
+  LOOP UNTIL irPulse > 200
+
+p1 = irPulse
+
+  PULSIN IR_IN, 0, irPulse                       ' Get data pulses
+p2 = irPulse
+  IF irPulse > 100 THEN
+    remoteCode.0 = 1
+  endif
+  PULSIN IR_IN, 0, irPulse
+p3 = irPulse
+  IF irPulse > 100 THEN
+    remoteCode.1 = 1
+  ENDIF
+  PULSIN IR_IN, 0, irPulse
+  IF irPulse > 100 THEN
+    remoteCode.2 = 1
+  ENDIF
+  PULSIN IR_IN, 0, irPulse
+  IF irPulse > 100 THEN
+    remoteCode.3 = 1
+  ENDIF
+  PULSIN IR_IN, 0, irPulse
+  IF irPulse > 100 THEN
+    remoteCode.4 = 1
+  ENDIF
+  PULSIN IR_IN, 0, irPulse
+  IF irPulse > 100 THEN
+    remoteCode.5 = 1
+  ENDIF
+  PULSIN IR_IN, 0, irPulse
+  IF irPulse > 100 THEN
+    remoteCode.6 = 1
+  ENDIF
+
+  if remotecode = 16 then
+    lcd_str "CH+ "
+  elseif remotecode = 17 then
+    lcd_str "CH- "
+  elseif remotecode = 18 then
+    lcd_str "VOL+"
+  elseif remotecode = 19 then
+    lcd_str "VOL-"
+  elseif remotecode = 20 then
+    lcd_str "Mute"
+  elseif remotecode = 21 then
+    lcd_str "Powr"
+  elseif remotecode = 11 then
+    lcd_str "Ent "
+  elseif remotecode = 59 then
+    lcd_str "PCH "
+  elseif remotecode = 9 then
+    lcd_str "0   "
+  elseif remotecode < 10 then
+    temp1 = remoteCode + 1
+    lcd_int temp1
+    lcd_str "   "
+  else
+    lcd_str "UNKNOWN: "
+    temp1 = remoteCode
+    lcd_int temp1
+    serout lcd, t19200, 13
+  endif
+'  serout lcd, t19200, ":"
+ ' lcd_int p1
+  'serout lcd, t19200, "/"
+'  lcd_int p2
+ ' serout lcd, t19200, "/"
+  'lcd_int p3
+'  serout lcd, t19200, 13
+  pause 200
+LOOP                                         ' Repeat main DO...LOOP
+
+SUB lcd_int
+  temp1 = __PARAM1, __PARAM2
+  do
+     temp2 = temp1 // 10
+     temp2 = temp2 + 48 
+     serout lcd, t19200, temp2_lsb
+     temp1 = temp1 / 10
+  loop until temp1 = 0
+  return
+   
+sub LCD_STR
+  temp3 = __PARAM1                              ' get string offset
+  temp4 = __PARAM2                              ' get string base
+  DO
+    READ temp4 + temp3, temp5                   ' read a character
+    IF temp5 = 0 THEN EXIT                      ' if 0, string complete
+    serout lcd, t19200, temp5                    		' send the byte
+    INC temp3                                   ' point to next character
+    temp4 = temp4 + Z                           ' update base on overflow
+  LOOP
+  RETURN

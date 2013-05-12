@@ -1,0 +1,25 @@
+		DEVICE	SX28L,OSC1MHZ,TURBO
+		RESET	Start
+		FREQ 1_000_000
+
+;Define all symbols
+		Count1	EQU	$08
+		Count2	EQU	$09
+
+		WATCH	Count1,16,UDEC
+
+Start		mov	RB, #%00000000	;Set port B output latch to zero
+		mov	!RB,#%11111110	;Set port B.bit0 to output direction
+		
+Main		call	delay		;delay					
+		mov	W,/RB.0		;grab inverse of RB bit0
+		mov	RB.0,W		;and store it in RB bit0
+		jmp	Main		;goto main				
+
+
+Delay		clr	Count1  	;Initialize Count1, Count2	
+		clr	Count2		;					
+
+Loop		djnz	Count1,loop	;Decrement until all are zero		
+		djnz	Count2,loop	;					
+		RET			;then return				

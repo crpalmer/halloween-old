@@ -1,0 +1,108 @@
+
+INSTALLATION OF CC1B
+
+
+SYSTEM REQUIREMENTS
+-------------------
+
+The CC1B compiler is available as a 32 bit application (console
+application) and runs on IBM-PC compatible machines using Windows
+(95/98/me/NT/2000/XP).
+
+The installation program runs under Windows. Around 3-5 MB of free
+disk space is needed to complete installation.
+
+
+
+INSTALLATION
+------------
+
+A Windows installation program is available. The installation is
+completed by a few simple steps.
+
+A license file is needed to install a licensed compiler edition.
+This file should preferably be stored at the same folder as the
+installation program. Otherwise the license file has to be located
+during the installation process.
+
+CC1B is ready to compile C files after installation. Header and C
+source files have to be created and edited by separate tools (not
+included).
+
+The CC1B files can be deleted without any uninstallation procedure.
+
+
+
+ZIP FILE
+--------
+
+The compiler is alternatively supplied as a ZIP file if the Windows
+installation program can not be used for some reason. A tool like
+PKUNZIP or WINZIP is required to extract the files into the desired
+compiler folder.
+
+First create a directory/folder on the hard disk where the compiler
+files should be located. Most application programs are found in the
+"Program Files" folder on the C: drive.
+
+
+
+SUPPORT FOR LONG FILE NAMES
+---------------------------
+
+CC1B supports long file names. It is also possible to use spaces in
+file names and include directory names.
+
+Equivalent include directory option formats:
+
+   -I"C:\Program Files\cc1b"
+   -IC:\progra~1\cc1b
+
+Equivalent include file formats:
+
+   #include "C:\Program Files\cc1b\C file"
+   #include "C:\progra~1\cc1b\Cfile~1"
+
+The alternative to long names is the truncated short format. The
+truncated form is decided by the file system. The best guess
+consists of the 6 first characters of the long name plus ~1. The
+last number may be different (~2) if the first 6 characters are
+equal to another name in the same directory.
+
+
+
+USER INTERFACE
+--------------
+
+The CC1B compiler is a console program. It requires a list of
+command line options to compile a C source file and produce the
+required files.
+
+Starting CC1B from Windows can be done from the Start->Run menu.
+Then type the full path name including cc1b.exe (or use Browse). The
+list of compiler command line options are then written to the
+screen. The normal way of using CC1B is to use it as a tool from an
+integrate environment like MPLAB.
+
+In a MSDOS window, the compiler is invoked by writing (note that
+the full path may have to be written):
+
+  cc1b
+
+This produces an list of the valid arguments to the compiler.
+
+Compiling a program is done by:
+
+  cc1b demo.c
+
+Generating an assembly file:
+
+  cc1b -a demo.c
+
+
+
+INTEGRATED ENVIRONMENTS
+-----------------------
+
+It is possilbe to use CC1B in integrated environments. However,
+no description is currently available.

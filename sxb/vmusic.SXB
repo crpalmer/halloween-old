@@ -1,0 +1,382 @@
+' =========================================================================
+'
+'   File...... EZ_VMUSIC.SXB
+'   Purpose...
+'   Author.... Jon Williams, EFX-TEK
+'              Copyright (c) 2008 EFX-TEK
+'              Some Rights Reserved
+'              -- see http://creativecommons.org/licenses/by/3.0/
+'   E-mail.... jwilliams@efx-tek.com
+'   Started...
+'   Updated... 08 JAN 2009
+'
+' =========================================================================
+
+
+' -------------------------------------------------------------------------
+' Program Description
+' -------------------------------------------------------------------------
+
+
+' -------------------------------------------------------------------------
+' Conditional Compilation Symbols
+' -------------------------------------------------------------------------
+
+
+' -------------------------------------------------------------------------
+' Device Settings
+' -------------------------------------------------------------------------
+
+ID              "VMUSIC"
+
+DEVICE          SX28, OSCHS3, TURBO, STACKX, OPTIONX, BOR42
+FREQ            50_000_000
+
+
+' -------------------------------------------------------------------------
+' I/O Pins
+' -------------------------------------------------------------------------
+
+RX              PIN     RC.7 INPUT              ' pull-up
+TX              PIN     RC.6 INPUT              ' pull-up
+
+
+' -------------------------------------------------------------------------
+' Constants
+' -------------------------------------------------------------------------
+
+Baud            CON     "OT38400"
+
+CR              CON     13
+
+Yes             CON     1
+No              CON     0
+
+
+' -------------------------------------------------------------------------
+' Variables
+' -------------------------------------------------------------------------
+
+flags           VAR     Byte
+ isPaused       VAR     flags.0
+
+
+tmpB1           VAR     Byte                    ' work vars
+tmpB2           VAR     Byte
+tmpB3           VAR     Byte
+tmpB4           VAR     Byte
+tmpW1           VAR     Word
+tmpW2           VAR     Word
+
+
+' =========================================================================
+' Subroutine / Function Declarations
+' =========================================================================
+
+DELAY_MS        SUB     1, 2
+
+RX_BYTE         FUNC    1, 0
+TX_BYTE         SUB     1
+TX_STR          SUB     2
+TX_HEX2         SUB     1                       ' transmit in HEX2 format
+
+VM_PLAY         SUB     2                       ' play MP3 file
+VM_REPEAT       SUB     2                       ' repeat MP3 file
+VM_STOP         SUB     0
+VM_PAUSE        SUB     0
+VM_RESUME       SUB     0
+VM_VOLUME       SUB     1                       ' overall volume
+VM_PAN          SUB     2                       ' set left and right levels
+VM_WAIT_PROMPT  SUB     0                       ' waits for ">" prompt
+VM_WAIT_START   SUB     0                       ' wait for song start
+
+
+' =========================================================================
+  PROGRAM Start
+' =========================================================================
+
+Start:
+  PLP_A = %0000                                 ' pull-up unused pins
+  PLP_C = %1100_0000
+  RB = 0
+
+  HIGH RB.5
+  TX = 1                                        ' set to idle
+  DELAY_MS 6_000                                ' let VMUSIC power up
+  LOW RB.5
+  TX_BYTE CR                                    ' ping VMUSIC
+  HIGH RB.4
+  VM_WAIT_PROMPT
+  LOW RB.4
+  VM_STOP 
+  HIGH RB.3                                      ' stop if playing
+  VM_WAIT_PROMPT
+  LOW RB.3
+  VM_VOLUME $00                                 ' reset to MAX
+  HIGH RB.2
+  VM_WAIT_PROMPT
+  LOW RB.2
+
+  HIGH RB.0
+
+
+Main:
+  TX_STR  "VPF 0.MP3"
+  TX_BYTE CR
+  isPaused = No                                 ' clear paused flag
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 1.MP3"
+  TX_BYTE CR
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 2.MP3"
+  TX_BYTE CR
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 3.MP3"
+  TX_BYTE CR
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 4.MP3"
+  TX_BYTE CR
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 5.MP3"
+  TX_BYTE CR
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 6.MP3"
+  TX_BYTE CR
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 7.MP3"
+  TX_BYTE CR
+
+  VM_WAIT_START
+  VM_WAIT_PROMPT
+  TX_STR  "VPF 8.MP3"
+  TX_BYTE CR
+
+
+  HIGH RB.1
+
+  VM_WAIT_PROMPT
+  DO
+    TOGGLE RB.1
+    DELAY_MS 100
+  LOOP
+ 
+
+
+  END
+
+
+
+' -------------------------------------------------------------------------
+' Subroutine / Function Code
+' -------------------------------------------------------------------------
+
+' Use: DELAY_MS duration
+' -- shell for PAUSE
+
+SUB DELAY_MS
+  mSecs         VAR     __WPARAM12
+
+  \ SB  __PARAMCNT.1
+  \ CLR mSecs_MSB
+  PAUSE mSecs
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: aByte = RX_BYTE
+' -- shell for SERIN
+
+FUNC RX_BYTE
+  SERIN RX, Baud, __PARAM1
+  ENDFUNC
+
+' -------------------------------------------------------------------------
+
+' Use: TX_BYTE aByte
+' -- shell for SEROUT
+
+SUB TX_BYTE
+  SEROUT TX, Baud, __PARAM1
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: TX_STR [String | Label]
+' -- pass embedded string or DATA label
+
+SUB TX_STR
+  tmpW1 = __WPARAM12
+
+  DO
+    READINC tmpW1, __PARAM1
+    IF __PARAM1 = 0 THEN EXIT
+    TX_BYTE __PARAM1
+  LOOP
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: TX_HEX2 byteVal
+' -- transmit byte in HEX2 format
+
+SUB TX_HEX2
+  tmpB1 = __PARAM1
+ 
+  tmpB2 = tmpB1 & $F0                           ' isolate high nib
+  SWAP tmpB2                                    ' move for READ
+  READ Hex_Digits + tmpB2, tmpB2                ' convert to ASCII
+  TX_BYTE tmpB2
+  tmpB1 = tmpB1 & $0F                           ' isolate high nib
+  READ Hex_Digits + tmpB1, tmpB1
+  TX_BYTE tmpB1
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_PLAY [String | Label]
+' -- issues single play command to VMUSIC player
+' -- name should be less than eight characters -- assumes MP3 extension
+
+SUB VM_PLAY
+  tmpW2 = __WPARAM12
+
+  TX_STR  "VPF "
+  TX_STR  tmpW2
+  TX_STR  ".MP3"
+  TX_BYTE CR
+  isPaused = No                                 ' clear paused flag
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_REPEAT [String | Label]
+' -- issues repeat play command to VMUSIC player
+' -- name should be less than eight characters -- assumes MP3 extension
+
+SUB VM_REPEAT
+  tmpW2 = __WPARAM12
+
+  TX_STR  "VRF "
+  TX_STR  tmpW2
+  TX_STR  ".MP3"
+  TX_BYTE CR
+  isPaused = No                                 ' clear paused flag
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VST
+' -- stops playback of VMUSIC player
+
+SUB VM_STOP
+  TX_STR  "VST"
+  TX_BYTE CR
+  isPaused = No                                 ' clear paused flag
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_PAUSE
+' -- pauses VMUSIC player
+' -- using VP allows paused file to be overridden
+
+SUB VM_PAUSE
+  IF isPaused = No THEN
+    TX_STR  "VP"
+    TX_BYTE CR
+    isPaused = Yes                              ' toggle paused bit
+  ENDIF
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_RESUME
+' -- resumes VMUSIC player
+
+SUB VM_RESUME
+  IF isPaused = Yes THEN
+    TX_STR  "VP"
+    TX_BYTE CR
+    isPaused = No
+  ENDIF
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_VOLUME level
+' -- sets overall volume of VMUSIC player
+
+SUB VM_VOLUME
+  tmpB3 = __PARAM1                              ' capture volume
+
+  tmpB3 = tmpB3 MAX $FE
+ 
+  TX_STR "VSV $"
+  TX_HEX2 tmpB3
+  TX_BYTE CR
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_PAN left, right
+' -- sets left and right channels independently
+
+SUB VM_PAN
+  tmpB3 = __PARAM1                              ' capture levels
+  tmpB4 = __PARAM2
+
+  tmpB3 = tmpB3 MAX $FE
+  tmpB4 = tmpB4 MAX $FE
+
+  TX_STR "VWR $0B"                              ' write to VS1003
+  TX_HEX2 tmpB4                                 ' assuming little endian
+  TX_HEX2 tmpB3
+  TX_BYTE CR
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_WAIT_PROMPT
+' -- waits for caret character at end of command prompt
+
+SUB VM_WAIT_PROMPT
+  DO
+    tmpB1 = RX_BYTE
+  LOOP UNTIL tmpB1 = ">"
+  ENDSUB
+
+' -------------------------------------------------------------------------
+
+' Use: VM_WAIT_START
+' -- waits for start of MP3 position data: "T $"
+
+SUB VM_WAIT_START
+  tmpB1 = RX_BYTE
+  IF tmpB1 <> "T" THEN VM_WAIT_START
+  tmpB1 = RX_BYTE
+  IF tmpB1 <> " " THEN VM_WAIT_START
+  tmpB1 = RX_BYTE
+  IF tmpB1 <> "$" THEN VM_WAIT_START
+  ENDSUB 
+
+
+' =========================================================================
+' User Data
+' =========================================================================
+
+Hex_Digits:
+  DATA  "0123456789ABCDEF"

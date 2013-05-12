@@ -1,0 +1,81 @@
+DEVICE          SX28, OSCHS3, TURBO, STACKX, OPTIONX, BOR42
+FREQ            50_000_000
+STACK		16
+
+LCD		PIN	RC.7
+time		VAR	WORD
+digit		VAR	WORD
+byte_to_lcd 	SUB 	1
+digit_to_lcd 	SUB 	1
+BAUD            CON     "OT19200"
+
+PROGRAM start
+
+start:
+
+  PAUSE 1000			' Make sure everything is powered up
+  byte_to_lcd $16		' display on, no cursor, no blink
+  byte_to_lcd $11		' backlight on
+
+main:
+
+  byte_to_lcd $0C		' cls, needs 5 ms pause, give it a little extra just in case
+  PAUSE 100
+
+  time = 15*60
+
+counting_down:
+  time = time - 1
+
+  byte_to_lcd $85		' goto position (0,5)
+
+  digit = time / 600
+  digit = digit // 10
+  digit_to_lcd digit_LSB
+
+  digit = time / 60
+  digit = digit // 10
+  digit_to_lcd digit_LSB
+
+  byte_to_lcd ":"
+
+  digit = time / 10
+  digit = digit // 6
+  digit_to_lcd digit_LSB
+
+  digit = time // 10
+  digit_to_lcd digit_LSB
+
+  IF time > 0 THEN
+    PAUSE 1000			' off by a little bit due to execution, but close enough
+    GOTO counting_down		' when run at a high speed with a high baud rate
+  ENDIF
+
+  ' trigger the bomb
+
+  time = 10
+flash_zero:
+  byte_to_lcd $0C
+  pause 250
+  byte_to_lcd $85
+  byte_to_lcd "0"
+  byte_to_lcd "0"
+  byte_to_lcd ":"
+  byte_to_lcd "0"
+  byte_to_lcd "0"
+  pause 250
+  time = time - 1
+  if time > 0 then flash_zero
+
+  GOTO main
+
+SUB digit_to_lcd
+  x VAR BYTE
+  x = __PARAM1
+  x = x + "0"
+  byte_to_lcd x
+endsub
+
+SUB byte_to_lcd
+  SEROUT LCD, BAUD, __PARAM1
+ENDSUB

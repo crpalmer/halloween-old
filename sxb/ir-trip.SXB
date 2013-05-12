@@ -1,0 +1,19 @@
+DEVICE          SX28, OSCHS1, TURBO, STACKX, OPTIONX, BOR42
+FREQ            4_000_000
+
+led		PIN	RC.0
+ir_in		PIN	RC.1
+
+program start
+
+start:
+
+low led
+
+output rb.0
+
+do
+	pause 50
+	freqout led, 1, 38500
+	rb = ir_in
+loop

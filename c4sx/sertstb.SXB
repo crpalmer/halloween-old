@@ -1,0 +1,36 @@
+' sertxtb.sxb: simple program use verify serial I/O is working
+' ra.0 is output
+' ra.1 is input
+' ra.2 is input
+' ra.3 is output
+DEVICE          SX28, TURBO, STACKX, OPTIONX
+FREQ            50_000_000
+PROGRAM start_point
+' constants
+' strings
+world:
+	data	13,10,"Hello SX/B!",13,10,"push 'a' to loop again",0
+' variables
+cnt var byte
+ch var byte
+' code
+start_point:
+' register setup
+TRIS_A=%0110
+TRIS_B=%11111111
+TRIS_C=%11111111
+ra.3 = 1
+'
+DO
+  cnt = 0
+  DO
+    READ world + cnt, ch
+    IF ch = 0 THEN EXIT
+    SEROUT ra.3, T19200, ch
+    INC cnt
+  LOOP
+  SEROUT ra.3, T19200,">"
+  SERIN ra.2,T19200,ch
+LOOP WHILE ch = "a" 
+'
+SLEEP
