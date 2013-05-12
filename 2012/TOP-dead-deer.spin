@@ -15,57 +15,41 @@ CON
   SKULL_SERVO = 7
   SKULL_LEDS = 6
 
-  PIR = 16
-  BUTTON = 17
-  MANUAL = 18
+  WHEELS_COUNTDOWN_N_TRACKS = 25
+  N_TRACKS = 8 
 
 OBJ
 
   skull : "talking_skull"
   play_file : "play_file"
-  'debug : "Parallax Serial Terminal"
+  random_track : "random_track"
+  debug : "Parallax Serial Terminal"
  
-PUB Deer | P, seed, ms, buttons, pirs, pir_blocked
+PUB Deer | P, seed, ms, wheels_countdown, wav
 
-  'debug.start(250000)
+  debug.start(250000)
   play_file.start(SD_P0, AUDIO_P0)
   skull.start(ANNIE_MIN_POS, ANNIE_RANGE, play_file.sampleAddress, SKULL_SERVO, SKULL_LEDS, 1)
+  random_track.init
   
   seed := 1234567
   ms := clkfreq / 1000
+  wheels_countdown := WHEELS_COUNTDOWN_N_TRACKS
   
   repeat
-    buttons := 0
-    pirs := 0
-    pir_blocked := 5
-
-    repeat while ina[MANUAL] and buttons < 100
-      buttons := buttons * ina[BUTTON] + ina[BUTTON]
-      pirs := pirs * ina[PIR] + ina[PIR]
-      ?seed
-      'debug.dec(ina[MANUAL])
-      'debug.dec(ina[BUTTON])
-      'debug.dec(ina[PIR])
-      'debug.dec(buttons)
-      'debug.str(STRING(","))
-      'debug.dec(pirs)
-      'debug.str(STRING(","))
-      'debug.dec(pir_blocked)
-      'debug.str(STRING(" "))
-    
-      if pirs > 100 and pir_blocked == 0
-        pir_blocked := 30000
-        play_file.synchronously(STRING("push.wav"), 1)
-        
-      waitcnt(cnt + ms)
-      if pir_blocked > 0
-        pir_blocked := pir_blocked - 1
-        pirs := 0
-
-    play_file.synchronously(STRING("wheels.wav"), 1)
+    wheels_countdown := wheels_countdown - 1
+    debug.str(STRING(" wheels_countdown="))
+    debug.dec(wheels_countdown)
+    if wheels_countdown == 0
+      wheels_countdown := WHEELS_COUNTDOWN_N_TRACKS
+      'play_file.synchronously(STRING("wheels.wave"), 1)
+    else
+      wav := random_track.random_wave_file(N_TRACKS)
+      debug.str(wav) 
+      play_file.synchronously(wav, 1)
     ?seed
-    if not ina[MANUAL]
-      P := ||seed
-      P := P // 20000 + 5000
-      waitcnt(cnt + ms * P)
-                        
+    P := ||seed
+    P := P // 10000 + 3000
+    debug.str(STRING(" sleep="))
+    debug.dec(P)
+    waitcnt(cnt + ms * P)            
