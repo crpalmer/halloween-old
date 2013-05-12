@@ -1,0 +1,27 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="2_data" version="1.3.0" audacityversion="1.3.9" sel0="0.0000000000" sel1="4.3444671202" vpos="0" h="0.0000000000" zoom="86.1328125000" rate="44100">
+	<tags>
+		<tag name="id3v2" value="1"/>
+	</tags>
+	<wavetrack name="77634__lendrick__growl3" channel="0" linked="1" mute="0" solo="0" height="150" minimized="0" rate="44100" gain="1" pan="0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="191591">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000a29.au" len="191591" min="-0.82798" max="0.836826" rms="0.107481"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="77634__lendrick__growl3" channel="1" linked="0" mute="0" solo="0" height="150" minimized="0" rate="44100" gain="1" pan="0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="191591">
+				<waveblock start="0">
+					<simpleblockfile filename="e000023e.au" len="191591" min="-0.836416" max="0.765186" rms="0.105813"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+</project>

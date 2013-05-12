@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<audacityproject projname="3_data" version="1.1.0" audacityversion="1.2.6" sel0="2.7113125000" sel1="2.7113125000" vpos="0" h="0.1183509425" zoom="557.6634932344" rate="48000.000000" >
+	<tags title="" artist="" album="" track="-1" year="" genre="-1" comments="" id3v2="1" />
+	<wavetrack name="344__Anton__dog_Bark_somedistorted_water" channel="2" linked="0" offset="0.00000000" rate="48000.000000" gain="1.000000" pan="0.000000" >
+		<sequence maxsamples="262144" sampleformat="262159" numsamples="130143" >
+			<waveblock start="0" >
+				<simpleblockfile filename='b00141.au' len='130143' min='-0.903198' max='0.888306' rms='0.237814'/>
+			</waveblock>
+		</sequence>
+		<envelope numpoints='0'>
+		</envelope>
+	</wavetrack>
+</audacityproject>
