@@ -1,0 +1,180 @@
+' =========================================================================
+'
+'   File...... VMusic.BS1
+'   Purpose...
+'   Author.... Jon Williams, EFX-TEK (www.efx-tek.com)
+'   E-mail.... jwilliams@efx-tek.com
+'              Copyright (c) 2008-2009 EFX-TEK
+'              Some Rights Reserved
+'              see: http://creativecommons.org/licenses/by/3.0/us/
+'   Started...
+'   Updated... 28 MAY 2009
+'
+'   {$STAMP BS1}
+'   {$PBASIC 1.0}
+'
+' =========================================================================
+
+
+' -----[ Program Description ]---------------------------------------------
+'
+' Demo for VMUSIC2 player
+' -- P7 and P6 SETUP jumpers need to be in the UP position
+' -- clip pins 1, 2 and 3 from ULN2803, or pins 1 and 2 from the ULN2003
+' -- use P5 for Sio (no ULN) to EFX-TEK accessories
+' -- use P4 for (active-high) trigger -- leave ULN intact for pull-down
+
+
+' -----[ Revision History ]------------------------------------------------
+
+
+' -----[ I/O Definitions ]-------------------------------------------------
+
+SYMBOL  RX              = 7                     ' SETUP = UP, no ULN
+SYMBOL  TX              = 6                     ' SETUP = UP, no ULN
+SYMBOL  Sio             = 5                     ' no ULN
+SYMBOL  Trigger         = PIN4
+
+
+' -----[ Constants ]-------------------------------------------------------
+
+SYMBOL  IsOn            = 1                     ' for active-high in/out
+SYMBOL  IsOff           = 0
+
+SYMBOL  Yes             = 1
+SYMBOL  No              = 0
+
+SYMBOL  VolMax          = 0
+SYMBOL  VolMin          = $FE
+
+SYMBOL  Baud            = OT2400
+
+
+' -----[ Variables ]-------------------------------------------------------
+
+SYMBOL  theMP3          = B2                    ' MP3 file pointer
+SYMBOL  eePntr          = B3                    ' EEPROM memory pointer
+SYMBOL  char            = B4                    ' character value
+SYMBOL  mute            = B5                    ' mute level (0 = loudest)
+SYMBOL  idx             = B6                    ' loop controller
+
+
+' -----[ Initialization ]--------------------------------------------------
+
+Reset:
+  PAUSE 2250                                    ' let VMUSIC power up
+  GOSUB VM_Stop                                 ' stop if playing
+  GOSUB VM_Wait_Prompt
+
+
+' -----[ Program Code ]----------------------------------------------------
+
+Main:
+  DEBUG CLS, "Playing FIREFLY.MP3", CR
+  theMP3 = 0
+  GOSUB VM_Play
+  GOSUB VM_Wait_Start
+  DEBUG "-- file started", CR
+
+  PAUSE 5000
+  mute = 25
+  GOSUB VM_Mute
+  GOSUB VM_Wait_Prompt
+  DEBUG "-- volume level reduced", CR
+
+  GOSUB VM_Wait_Prompt
+  DEBUG "-- ready for new song", CR
+
+  mute = VolMax                                 ' restore full volume
+  GOSUB VM_Mute
+  GOSUB VM_Wait_Prompt
+  DEBUG "-- volume reset to max", CR, CR
+
+  DEBUG "Playing SERENITY.MP3", CR
+  theMP3 = 1
+  GOSUB VM_Play
+  GOSUB VM_Wait_Start
+  DEBUG "-- file started", CR, CR
+
+  GOSUB VM_Wait_Prompt
+  DEBUG "VMUSIC demo done", CR, CR
+
+  PAUSE 5000
+  GOTO Main
+
+
+' -----[ Subroutines ]-----------------------------------------------------
+
+VM_Wait_Prompt:
+  SERIN RX, Baud, (">")
+  RETURN
+
+' -------------------------------------------------------------------------
+
+' Pass file # (index in EEPROM table) to play in "theMP3"
+
+VM_Play:
+  SEROUT TX, Baud, ("VPF ")
+  GOTO Play_MP3
+
+' -------------------------------------------------------------------------
+
+' Pass file # (index in EEPROM table) to play in "theMP3"
+
+VM_Repeat:
+ SEROUT TX, Baud, ("VRF ")
+
+' -------------------------------------------------------------------------
+
+Play_MP3:
+  eePntr = theMP3 * 8                           ' calc address of name
+
+Send_Name:                                      ' send file title
+  FOR idx = 1 TO 8                              ' max is 8 characters
+    READ eePntr, char                           ' get a character
+    IF char = 0 THEN Finish_Cmd                 ' if 0, we're at end
+    SEROUT TX, Baud, (char)
+    eePntr = eePntr + 1
+  NEXT
+
+Finish_Cmd:
+  SEROUT TX, Baud, (".MP3", 13)                 ' send extention + CR
+  RETURN
+
+' -------------------------------------------------------------------------
+
+VM_Wait_Start :
+  SERIN RX, Baud, ("T $")
+  RETURN
+
+' -------------------------------------------------------------------------
+
+VM_Stop:
+  SEROUT TX, Baud, ("VST", 13)
+  RETURN
+
+' -------------------------------------------------------------------------
+
+' Pass mute (0 = loudest, 254 = muted) in "mute"
+
+VM_Mute:
+  mute = mute MAX VolMin                        ' limit per spec
+  SEROUT TX, Baud, ("VSV ", #mute, 13)
+  RETURN
+
+
+' -----[ User Data ]-------------------------------------------------------
+
+' File names are stored on 8-byte boundaries -- this is very important for
+' correct program operation.  This strategy uses a little more EE space but
+' is easier to update and maintain
+
+Song_List:
+  EEPROM $00, ("firefly")                       ' theMP3 = 0
+  EEPROM $08, ("serenity")                      ' theMP3 = 1
+  EEPROM $10, ("spalding")
+  EEPROM $18, ("file3")
+  EEPROM $20, ("file4")
+  EEPROM $28, ("file5")
+  EEPROM $30, ("file6")
+  EEPROM $38, ("file7")

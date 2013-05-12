@@ -1,0 +1,49 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+' This program is the servo controller for the hayride-driver
+' program.  It has two inputs from the driver.  One to turn
+' the wheels on and one to make the wheels go fast.
+'
+' When the wheels go from fast to slow it has to ramp them
+' down slowly.  Experimentally it seemed like slowing them
+' down too fast caused too much power consumption and this
+' could stall or reset the controller.
+
+SYMBOL servo1 = 0
+SYMBOL servo2 = 1
+SYMBOL servo3 = 2
+SYMBOL servo4 = 3
+SYMBOL gofast = PIN7    ' Pull down
+SYMBOL go     = PIN6    ' Pull down
+SYMBOL signal = W0
+SYMBOL isfast = B2
+SYMBOL i = B3
+
+SYMBOL slow = 152
+SYMBOL fast = 160
+
+signal = slow
+
+DIRS = %01111
+PINS = 0
+
+main:
+  IF go = 0 THEN main
+
+  IF gofast = 1 THEN dofast
+  IF signal <= slow THEN pulse
+  signal = signal - 1
+  GOTO pulse
+dofast:
+  signal = fast
+
+pulse:
+  FOR i = 1 TO 25
+    PULSOUT servo1, signal
+    PULSOUT servo2, signal
+    PULSOUT servo3, signal
+    PULSOUT servo4, signal
+    PAUSE 19
+  NEXT
+  GOTO main

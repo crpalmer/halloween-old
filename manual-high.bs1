@@ -1,0 +1,17 @@
+' {$STAMP BS1}
+
+SYMBOL  out          = PIN0
+SYMBOL  in           = PIN1
+
+Reset:
+  PINS = %00000000                              ' preset IOs
+  DIRS = %00000001                              ' set output pins (1s)
+
+
+Loop:
+  IF in = 0 THEN Loop
+  out = 1
+Loop2:
+  IF in = 1 THEN Loop2
+  out = 0
+  GOTO Loop

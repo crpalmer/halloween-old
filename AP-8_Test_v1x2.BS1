@@ -1,0 +1,182 @@
+' =========================================================================
+'
+'   File....... AP-8_Test_v1x2.BS1
+'   Purpose.... AP-8 Features Test
+'   Author..... EFX-TEK
+'   E-mail..... teamefx@efx-tek.com
+'   Started....
+'   Updated.... 21 SEP 2007
+'
+'   {$STAMP BS1}
+'   {$PBASIC 1.0}
+'
+' =========================================================================
+
+
+' -----[ Program Description ]---------------------------------------------
+'
+' Demonstration program for the AP-8 Audio Player Board.  All commands are
+' send to the AP-8 through a serial link at 2400 baud (OT2400 baudmode).
+' The use of the open baudmode allows boards to be daisy-chained for up to
+' 32 sounds from one I/O pin.
+'
+' Command syntax: "!AP8", address, cmd {, data}
+' -- where 'address' is %00 to %11
+' -- 'cmd' is a single character
+' -- optional 'data' is a byte
+'
+' Valid commands:
+'
+'   "!AP8", address, "V"
+'     -- requests version string from AP-8
+'     -- should be followed by SERIN to receive three-byte string
+'
+'   "!AP8", address, "G"
+'     -- retrieves current AP-8 status
+'     -- should be followed by SERIN to receive one-byte status
+'     -- status byte is bit-mapped:
+'        * BIT7 : 0 = idle, 1 = playing
+'        * BIT6 : 0 = regular play, 1 = soft looping (new to v1.2+)
+'        * BIT5 : 0 = hard loop select, 1 = single-shot mode
+'        * BIT4 : 0 = Play mode, 1 = Record mode
+'        * BIT3 : reserved
+'        * BIT2 : Segment switch 2 (0 = closed/on, 1 = open/off)
+'        * BIT1 : Segment switch 1
+'        * BIT0 : Segment switch 0
+'
+'   "!AP8", address, "P", segment
+'     -- plays selected segment (0 - 7)
+'
+'   "!AP8", address, "L", segment, count
+'     -- loops selected segment (0 - 7)
+'     -- if count = 0, loops until "P", "X", or "F" commands
+'     -- counted loops, 1 to 255
+'
+'   "!AP8", address, "X"
+'     -- stops AP-8 (if playing) at selected address
+'
+'   "!AP8", address, "F"
+'     -- fixes missing EOM on slot 7
+'     -- use only if slot 7 recorded past end
+'     -- only available in firmware versions 1.2 and higher
+'
+'
+' Note: If ULN2803 interferes with serial transmission to RC-4, remove and
+'       replace with ULN2003 (7 channels), leaving P7 contacts open.
+
+
+' -----[ Revision History ]------------------------------------------------
+
+
+' -----[ I/O Definitions ]-------------------------------------------------
+
+SYMBOL  Sio             = 7
+
+
+' -----[ Constants ]-------------------------------------------------------
+
+SYMBOL  Baud            = OT2400                ' baud jumper out
+SYMBOL  Addr            = %00                   ' both address jumpers out
+
+SYMBOL  Yes             = 1
+SYMBOL  No              = 0
+
+
+' -----[ Variables ]-------------------------------------------------------
+
+SYMBOL  status          = B0                    ' status (B0 for bit access)
+SYMBOL   Playing        = BIT7                  ' 0 = idle, 1 = playing
+SYMBOL   SoftLoop       = BIT6                  ' 0 = normal, 1 = soft loop
+SYMBOL   HardLoop       = BIT5                  ' 0 = hard loop, 1 = regular
+SYMBOL   PlayRec        = BIT4                  ' 0 = Play, 1 = Rec
+
+SYMBOL  id0             = B2
+SYMBOL  id1             = B3
+SYMBOL  id2             = B4
+SYMBOL  segment         = B5                    ' loop control
+SYMBOL  switches        = B6                    ' board switch settings
+SYMBOL  ctrlChar        = B7                    ' used for Debug Home
+
+
+' -----[ EEPROM Data ]-----------------------------------------------------
+
+
+' -----[ Initialization ]--------------------------------------------------
+
+Reset:
+  DEBUG CLS
+
+
+' -----[ Program Code ]----------------------------------------------------
+
+Main:
+  SEROUT Sio, Baud, ("!AP8", Addr, "V")         ' get version
+  SERIN  Sio, Baud, id0, id1, id2               ' receive ID string
+  DEBUG "AP-8 Version ", #@id0, #@id1, #@id2    ' display it
+  PAUSE 1000
+  DEBUG CLS
+
+  FOR segment = 0 TO 7
+    IF segment = 7 THEN Loop_It
+
+Play_It:
+    SEROUT Sio, Baud, ("!AP8", Addr, "P", segment)
+    IF id0 > "1" OR id2 >= "2" THEN Get_Status  ' no auto status as of 1.2
+      SERIN  Sio, Baud, status                  ' clear auto status byte
+      GOTO Get_Status
+
+Loop_It:
+    IF id0 = "1" AND id2 < "2" THEN Play_It
+      SEROUT Sio, Baud, ("!AP8", Addr, "L", segment, 2)
+
+Get_Status:
+    SEROUT Sio, Baud, ("!AP8", Addr, "G")       ' get status
+    SERIN  Sio, Baud, status
+
+Show_Status:
+    IF PlayRec = Yes THEN Mode_Error            ' AP-8 in record mode
+
+    switches = status & %00000111               ' isolate switch bits
+    IF switches <> %111 THEN Switch_Error       ' error if any closed
+
+    ctrlChar = 1
+    DEBUG #@ctrlChar                            ' home cursor
+    DEBUG "Segment #", #segment, CR             ' show board status
+    DEBUG CR
+    DEBUG "Idle / Playing....... ", #Playing, CR
+
+Check_Soft_Loop:                                ' soft looping available?
+    IF id0 = "1" AND id2 < "2" THEN No_Soft_Loop
+      DEBUG "Normal / Soft Loop... ", #SoftLoop, CR
+      GOTO Show_Status_2
+
+No_Soft_Loop:                                   ' no
+    DEBUG "Normal / Soft Loop... ", "N/A", CR
+
+Show_Status_2:
+    DEBUG "Loop / Single........ ", #HardLoop, CR
+    DEBUG "Play / Record........ ", #PlayRec, CR
+    DEBUG "Segment Sw2.......... ", #BIT2, CR
+    DEBUG "Segment Sw1.......... ", #BIT1, CR
+    DEBUG "Segment Sw0.......... ", #BIT0, CR
+
+    IF Playing = Yes THEN Get_Status            ' allow to finish
+  NEXT
+
+  DEBUG CLS, "Demo complete."
+  END
+
+
+Switch_Error:
+  DEBUG CLS
+  DEBUG "Please set AP-8 segment select", CR
+  DEBUG "switches to OPEN, then restart", CR
+  DEBUG "the program."
+  END
+
+
+Mode_Error:
+  DEBUG CLS
+  DEBUG "AP-8 is set to Record mode; please", CR
+  DEBUG "move PLAY/REC jumper to PLAY."
+  END

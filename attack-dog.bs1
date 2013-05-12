@@ -1,0 +1,151 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL servo = PIN0
+SYMBOL motion = PIN6
+SYMBOL sio = 7
+SYMBOL baud            = OT2400                ' baud jumper out
+SYMBOL audio           = %00                   ' both address jumpers out
+
+
+SYMBOL attack_track = 7
+
+SYMBOL i = W0
+SYMBOL   Playing = BIT7
+SYMBOL R = B2
+SYMBOL dest = B3
+SYMBOL speed = B4
+SYMBOL mad = B5
+SYMBOL attacks = B6
+SYMBOL signal = W4
+
+' W6 = B12/13 used for subroutine calls
+
+' PULSOUT sends a signal in units of 10us
+'
+' Modified Servo:
+'   * 1.5ms (150 units) == stop
+'   * bigger means speed left
+'   * smaller means speed right
+'   * on my one servo 152 was actually stop
+'
+' Unmodified Servo:
+'   * 1.5ms (150 units) == center position
+'   * 2.5ms (250 units) == 90 degrees left
+'   * 0.5ms ( 50 units) == 90 degrees right
+'   ? not sending any signal causes it to do nothing?
+'   ? servo seems to not be exactly centered
+
+'FOR i = 1 TO 10000
+'PULSOUT servo, 150
+'NEXT
+
+mad = 40
+
+main:
+
+PAUSE 5000
+
+waiting:
+
+DEBUG "W" , #motion
+
+' Always pick what we're going to do in the loop so that we keep stirring
+' the random number generato
+'    attacks : # of repeats of the audio track
+'    mad : madness (must be > 0 and <= 40)
+
+RANDOM R
+attacks = R // 5 + 1
+RANDOM R
+mad = R // 4 + 1
+mad = mad * 10
+
+' Enable this if you want it to just randomly attack
+'i = R // 100
+'IF i = 0 THEN attack
+
+IF motion = 0 THEN waiting
+
+' Someone has triggered the attack
+
+attack:
+
+' Are we done attacking for this time?
+
+attacks = attacks - 1
+IF attacks = 0 THEN main
+
+' Play the audio track
+
+SEROUT sio, baud, ("!AP8", audio, "P", attack_track)
+PAUSE 500
+
+attacking:
+
+' We have audio playing, move the head left and then right.
+' Between movements (left, return to center, right, return
+' to center) check to see if the audio completed so that
+' we don't move very long after it stops.
+
+RANDOM R
+dest = R // mad
+dest = 150 + dest + mad
+RANDOM R
+speed = R // 5
+speed = speed * mad / 10
+speed = speed + 1
+
+' Swing left and then back to center
+
+FOR signal = 150 TO dest STEP speed
+  GOSUB servo_cmd
+NEXT
+GOSUB check_done
+FOR signal = dest TO 150 STEP -speed
+  GOSUB servo_cmd
+NEXT
+GOSUB check_done
+
+RANDOM R
+dest = R // mad
+dest = 150 - dest - mad
+RANDOM R
+speed = R // 5
+speed = speed * mad / 20
+speed = speed + 1
+
+' Swing right and then back to center
+
+FOR signal = 150 TO dest STEP -speed
+  GOSUB servo_cmd
+NEXT
+GOSUB check_done
+FOR signal = dest TO 150 STEP speed
+  GOSUB servo_cmd
+NEXT
+
+' If the audio is still playing then keep doing this.
+
+GOSUB check_done
+GOTO attacking
+
+done:
+GOTO attack
+
+' servo_cmd : I had a tendency to screw up and forget the pause, this
+'    this function makes that impossible
+
+servo_cmd:
+  PULSOUT servo, signal
+  PAUSE 20
+  RETURN
+
+' check_done : this test is applied all over the place.  If the audio
+'    has stopped it will "GOTO done" and otherwise returns.
+
+check_done:
+  SEROUT sio, baud, ("!AP8", audio, "G")       ' get status
+  SERIN  sio, baud, i
+  IF playing = 0 THEN done
+  RETURN

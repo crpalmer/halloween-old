@@ -1,0 +1,56 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL  servo = PIN0
+
+SYMBOL  LOWEST  = 75
+SYMBOL  HIGHEST = 180
+SYMBOL  LOW_SPEED = 1
+SYMBOL  HIGH_SPEED = 3
+SYMBOL  SERVO_PAUSE = 20
+
+SYMBOL  R = W0
+SYMBOL  R_LSB = B0
+SYMBOL  tmp = B2
+SYMBOL  pos = B2
+SYMBOL  speed = B3
+SYMBOL  duration = B3
+
+main:
+    RANDOM R
+    tmp = R_LSB // 15
+    IF tmp = 0 THEN run_found
+
+run:
+    RANDOM R
+    speed = R_LSB // 10
+    IF speed = 0 THEN do_high_speed
+    speed = LOW_SPEED
+    GOTO run_loop
+do_high_speed:
+    speed = HIGH_SPEED
+
+run_loop:
+    FOR pos = LOWEST TO HIGHEST STEP speed
+        PULSOUT servo, pos
+        PAUSE SERVO_PAUSE
+    NEXT
+
+    FOR pos = HIGHEST TO LOWEST STEP -speed
+        PULSOUT servo, pos
+        PAUSE SERVO_PAUSE
+    NEXT
+    GOTO main
+
+run_found:
+    RANDOM R
+    duration = R_LSB // 50 + 200
+    FOR pos = 1 TO duration
+       PULSOUT servo, HIGHEST
+       PAUSE SERVO_PAUSE
+    NEXT
+    FOR pos = 1 TO 10
+       PULSOUT servo, LOWEST
+       PAUSE SERVO_PAUSE
+    NEXT
+    GOTO run

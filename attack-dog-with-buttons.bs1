@@ -1,0 +1,194 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+' I/O definitions
+
+SYMBOL BUTTON1 = PIN0
+SYMBOL BUTTON2 = PIN1
+SYMBOL OVERRIDE = PIN2
+SYMBOL LIGHTS = PIN3
+SYMBOL HEAD = 4
+SYMBOL TAIL = 5
+SYMBOL PIR = PIN6
+SYMBOL SIO = 7
+
+' Constants
+
+SYMBOL TRACK_ATTACK = 7
+SYMBOL HEAD_ATTACK = 30
+SYMBOL TAIL_ATTACK = 1
+
+SYMBOL TRACK_WHINE  = 6
+SYMBOL HEAD_WHINE  = 10
+SYMBOL TAIL_WHINE  = 10
+
+SYMBOL TRACK_HAPPY  = 3
+SYMBOL HEAD_HAPPY  = 20
+SYMBOL TAIL_HAPPY  = 30
+
+SYMBOL BAUD            = OT2400                ' baud jumper out
+SYMBOL AUDIO           = %00                   ' both address jumpers out
+
+' Variables
+
+'SYMBOL x  = W0
+SYMBOL x1 = B0
+SYMBOL starting = B1
+SYMBOL playing = BIT7
+SYMBOL R = W1
+SYMBOL head_at = B4
+SYMBOL tail_at = B5
+SYMBOL head_to = B6
+SYMBOL tail_to = B7
+SYMBOL head_lvl = B8
+SYMBOL tail_lvl = B9
+SYMBOL head_speed = B10
+SYMBOL tail_speed = B11
+SYMBOL track = B12
+SYMBOL pirs = track
+SYMBOL reps = B13
+
+' Initialize
+
+'DIRS = %11111000
+'PINS = 0
+
+'SEROUT SIO, BAUD, ("!AP8", AUDIO, "X")
+'PAUSE 2000
+
+' Wait for instructions
+
+start_waiting:
+
+starting = 1
+LIGHTS = 0
+pirs = 1
+
+IF OVERRIDE = 1 THEN waiting
+PAUSE 5000
+
+waiting:
+
+' Keep the random number moving
+
+RANDOM R
+
+' If not in manual mode, check the sensor
+
+IF OVERRIDE = 1 THEN manual
+
+pirs = pirs + PIR
+IF pirs <= 250 THEN waiting
+
+head_lvl = HEAD_ATTACK
+tail_lvl = TAIL_ATTACK
+track    = TRACK_ATTACK
+GOTO start
+
+' In manual move:
+'    PIN0 PIN1
+'      1   0    Attack
+'      0   1    Whine
+'      1   1    Happy
+
+manual:
+
+x1 = PINS & %11
+IF x1 = 0 THEN waiting
+PAUSE 100
+x1 = PINS & %11
+IF x1 = 0 THEN waiting
+
+LOOKUP x1, (0, HEAD_HAPPY, HEAD_ATTACK, HEAD_WHINE), head_lvl
+LOOKUP x1, (0, TAIL_HAPPY, TAIL_ATTACK, TAIL_WHINE), tail_lvl
+LOOKUP x1, (0, TRACK_HAPPY, TRACK_ATTACK, TRACK_WHINE), track
+
+start:
+
+LIGHTS = 1
+reps = R // 2 +1
+
+' Play the audio and move until it finishes
+
+rep:
+
+IF reps = 0 THEN start_waiting
+reps = reps - 1
+
+SEROUT SIO, BAUD, ("!AP8", AUDIO, "P", track)
+
+' Do one set of movements
+
+playing_loop:
+
+' Advance head checking to see if it needs a new position
+
+IF starting = 1 THEN new_head
+x1 = head_at + head_speed
+IF head_at <= head_to AND x1 >= head_to THEN new_head
+IF head_at >= head_to AND x1 <= head_to THEN new_head
+head_at = x1
+GOTO handle_tail
+
+' Pick a new head position
+
+new_head:
+
+RANDOM R
+head_speed = R // head_lvl + 1
+RANDOM R
+head_to = R // head_lvl + head_lvl
+IF x1 < 150 THEN head_big
+head_to = 150 - head_to
+head_speed = -head_speed
+'DEBUG "HL ", #head_to, " ", #head_speed, " ", #head_at, CR
+GOTO handle_tail
+head_big:
+head_to = 150 + head_to
+'DEBUG "HH ", #head_to, " ", #head_speed, " ", #head_at, CR
+
+' Advance tail checking to see if it needs a new position
+
+handle_tail:
+
+IF starting = 1 THEN new_tail
+x1 = tail_at + tail_speed
+IF tail_at <= tail_to AND x1 >= tail_to THEN new_tail
+IF tail_at >= tail_to AND x1 <= tail_to THEN new_tail
+tail_at = x1
+GOTO send_pulse
+
+' Pick a new tail_position
+
+new_tail:
+
+'RANDOM R
+tail_speed = R // tail_lvl / 2 + 1
+'RANDOM R
+tail_to = R // tail_lvl + tail_lvl
+IF x1 < 150 THEN tail_big
+tail_speed = -tail_speed
+tail_to = 150 - tail_to
+'DEBUG "TL ", #tail_to, " ", #tail_speed, " ", #tail_at, CR
+GOTO send_pulse
+tail_big:
+tail_to = 150 + tail_to
+'DEBUG "TH ", #tail_to, " ", #tail_speed, " ", #tail_at, CR
+
+' Now that we have a position, move to it
+
+send_pulse:
+
+DEBUG #head_at, " ", #tail_at, CR
+'PULSOUT HEAD, head_at
+'PULSOUT TAIL, tail_at
+PAUSE 20
+
+' Check to see if the audio is finished
+
+SEROUT SIO, BAUD, ("!AP8", AUDIO, "G")       ' get status
+SERIN  SIO, BAUD, x1
+
+IF playing = 0 THEN rep
+starting = 0
+GOTO playing_loop

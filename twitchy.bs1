@@ -1,0 +1,23 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL servo = PIN0
+SYMBOL pos = W0
+SYMBOL delta = B2
+SYMBOL delay = B3
+SYMBOL delay_time = B4
+
+pos = 100
+Main:
+RANDOM pos
+RANDOM delay_time
+
+pos = pos // 179 + 90
+delay_time = delay_time // 11
+
+FOR delay = 1 TO delay_time
+  PULSOUT servo, pos
+  PAUSE 20
+NEXT
+
+GOTO Main

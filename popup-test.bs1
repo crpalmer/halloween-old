@@ -1,0 +1,19 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL TRIGGER = PIN7
+SYMBOL POP = PIN0
+
+PINS = 0
+DIRS = 1
+
+main:
+   DEBUG "down", CR
+   POP = 0
+wait1:
+   IF TRIGGER = 0 THEN wait1
+   DEBUG "up", CR
+   POP = 1
+wait2:
+   IF TRIGGER = 1 THEN wait2
+   GOTO main

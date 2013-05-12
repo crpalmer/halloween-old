@@ -1,0 +1,38 @@
+
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL servo = PIN0
+SYMBOL pos = W0
+SYMBOL delay = W1
+SYMBOL R = W2
+
+' I'm still trying to figure out how the random works.  It seems to be based
+' on the current value so I'm trying to use a random variable to see how it
+' works
+
+R = 45244
+delay = 500
+pos = 210
+
+main_loop:
+PULSOUT servo, pos
+PAUSE 20
+IF delay = 0 THEN new_pos
+delay = delay - 1
+GOTO main_loop
+
+new_pos:
+
+RANDOM R
+pos = R // 359
+RANDOM R
+delay = R // 7
+
+' Pause because it seems to make the micro server move better
+' to have a non-signal command sent to it
+
+DEBUG "(", #pos, ", ", #delay, ")  "
+PAUSE 40
+
+GOTO main_loop

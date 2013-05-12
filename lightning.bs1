@@ -1,0 +1,113 @@
+' {$STAMP BS1}
+' -----[ I/O Definitions ]-------------------------------------------------
+
+SYMBOL  RX              = 7                     ' SETUP = UP, no ULN
+SYMBOL  TX              = 6                     ' SETUP = UP, no ULN
+SYMBOL  strike          = PIN0
+SYMBOL  PIR             = PIN5
+
+' -----[ Constants ]-------------------------------------------------------
+
+SYMBOL  Baud            = OT2400                 'Prop-1 speed
+
+SYMBOL  IsOn            = 1
+SYMBOL  IsOff           = 0
+
+SYMBOL  VolMax          = 0
+SYMBOL  VolMin          = $FE
+
+SYMBOL  N_TRACKS        = 6
+SYMBOL  N_BOLTS         = 5
+
+' -----[ Variables ]-------------------------------------------------------
+
+SYMBOL  lottery         = W0
+SYMBOL  delay           = W1
+SYMBOL  time            = W2
+SYMBOL  time_b          = B4
+SYMBOL  last            = B6
+SYMBOL  flashes         = B8
+SYMBOL  x               = B9
+SYMBOL  all_done        = B10
+
+' -----[ Initialization ]--------------------------------------------------
+
+Reset:
+  PINS = %00000000                              ' preset IOs
+  DIRS = %00000001                              ' set output pins (1s)
+  last = N_TRACKS
+  lottery = 1031
+
+' -----[ Program Code ]----------------------------------------------------
+
+new_round:
+  RANDOM lottery
+  delay = lottery // 20
+  delay = 1
+  all_done = 0
+
+waiting:
+  IF delay = 0 THEN start
+  PAUSE 100
+  delay = delay - 1
+  IF PIR = 0 THEN waiting
+  RANDOM lottery
+  GOTO waiting
+
+start:
+  RANDOM lottery
+  x = lottery // N_TRACKS
+  IF x = last THEN start
+  last = x
+
+  'DEBUG "Starting track:", #x
+
+  SEROUT TX, Baud, ("VPF ", #x, ".mp3", 13)
+  x = x * N_BOLTS
+
+a_bolt:
+    RANDOM lottery
+    flashes = lottery // 2 + 1
+    time = 0
+    READ x, time_b
+    IF time > 0 THEN init_time
+    all_done = 1
+
+init_time:
+    x = x + 1
+    time = time * 100
+'    DEBUG time
+
+a_flash:
+    strike = IsOn
+    RANDOM lottery
+    delay = lottery // 201 + 50 MAX time
+    time = time - delay
+    PAUSE delay
+    strike = IsOff
+    RANDOM lottery
+    delay = lottery // 51 + 50 MAX time
+    time = time - delay
+    PAUSE delay
+    flashes = flashes - 1
+    IF flashes > 0 THEN a_flash
+    IF all_done = 1 THEN wait_done
+
+'    DEBUG time, "... pausing..."
+
+    PAUSE time
+    GOTO a_bolt
+
+wait_done:
+    SERIN RX, Baud, (">")
+    GOTO new_round
+
+
+' -----[ User Data ]-------------------------------------------------------
+
+EEPROM (11,  6, 15,  0,  0)
+EEPROM (15,  0,  0,  0,  0)
+EEPROM ( 8,  5, 16,  0,  0)
+EEPROM (21, 22, 21,  6,  0)
+EEPROM (22,  0,  0,  0,  0)
+EEPROM (17, 14,  0,  0,  0)

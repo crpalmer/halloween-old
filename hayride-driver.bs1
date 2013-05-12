@@ -1,0 +1,149 @@
+' {$STAMP BS1}                                                                                         v
+' {$PBASIC 1.0}
+'
+' Hayride
+' -------
+'
+' Haunted hayride from 2009.
+'
+' The driver is a scary terry driven talking skull that randomly
+' either just talks or else he says something about the creature
+' that pops up in the back (with lights turning on).
+'
+' The hayride has 4 wheels that are driven by servos and
+' controlled by the hayride-wheels.bs1 program which lets us
+' enable the wheels and then control either low or hide speed
+' on them
+
+SYMBOL RX     = 7            ' uMP3's T, pull down?
+SYMBOL TX     = 6            ' uMP3's R, pull down?
+SYMBOL PIR    = PIN5
+SYMBOL MANUAL = PIN4
+SYMBOL GOFAST = PIN3         ' Signal to make the wheels fast
+SYMBOL WHEELS = PIN2         ' Signal to enable the wheels
+SYMBOL LIGHTS = PIN1
+SYMBOL POPUP  = PIN0
+
+SYMBOL BAUD = OT2400
+
+SYMBOL N_ATTACK_TRACKS = 4
+SYMBOL N_TALK_TRACKS = 10
+SYMBOL ATTACK_EVERY = 10
+
+SYMBOL R = W0
+SYMBOL i = W1
+SYMBOL track = B4
+SYMBOL n_tracks = B11
+SYMBOL old0 = B5
+SYMBOL old1 = B6
+SYMBOL old2 = B7
+SYMBOL status = B9
+SYMBOL attack = B10
+
+PINS = %00000000                              ' clear all outputs
+DIRS = %00001111                              ' make P0-3 outputs
+
+' main loop: wait, intro, random, finale, pause
+
+Reset:
+    GOSUB init_player
+    WHEELS = 1
+    R = 1031
+
+main:
+    i = 0
+    attack = "T"
+    n_tracks = N_TALK_TRACKS
+
+inter_loop_with_override:
+    PAUSE 100
+    i = i + 100
+    IF MANUAL = 1 THEN manual_pushed
+    IF i < 5000 THEN inter_loop_with_override
+    i = 0
+
+waiting:
+    RANDOM R
+    PAUSE 10
+    IF MANUAL = 1 THEN manual_pushed
+    i = i + 10 * PIR
+    IF i < 50 THEN waiting
+
+    i = R // ATTACK_EVERY
+    IF i <> 0 THEN pick_a_track
+    attack = "A"
+    n_tracks = N_ATTACK_TRACKS
+
+pick_a_track:
+    RANDOM R
+    track = R // n_tracks
+    IF track = old0 THEN pick_a_track
+    IF track = old1 THEN pick_a_track
+    IF track = old2 THEN pick_a_track
+    old2 = old1
+    old1 = old0
+    old0 = track
+    IF attack <> "A" THEN play_track
+
+    GOFAST = 1
+    POPUP  = 1
+
+play_track:
+    GOSUB play
+
+wait_track:
+    RANDOM R
+    GOSUB get_status
+    IF status = "S" THEN done
+    IF status <> "P" THEN wait_track
+    IF attack = "A" THEN toggle_attack
+    IF manual = 0 THEN wait_track
+    POPUP = 1
+    LIGHTS = 1
+    toggle_attack:
+    RANDOM R
+    i = R // 125 + 50
+    PAUSE i
+    LIGHTS = 0
+    RANDOM R
+    i = R // 125 + 50
+    PAUSE i
+    LIGHTS = 1
+    GOTO wait_track
+
+
+done:
+    GOFAST = 0
+    LIGHTS = 0
+    POPUP  = 0
+
+    GOTO main
+
+manual_pushed:
+    attack = "A"
+    GOTO pick_a_track
+
+' ------------------- utilities --------------------
+
+init_player:
+    PAUSE 1000
+    SEROUT TX, Baud, ("PC S", 13)
+    RETURN
+
+play:
+    SEROUT TX, Baud, ("PC F ", attack, #track, ".mp3", 13)
+    RETURN
+
+wait_done_playing:
+    GOSUB get_status
+    IF status <> "S" THEN wait_done_playing
+    RETURN
+
+get_status:
+    PAUSE 100
+    SEROUT TX, Baud, ("PC Z", 13)                 ' request status
+    SERIN  RX, Baud, status                       ' will be "S" or "P"
+    IF status = "S" THEN get_status_done
+    IF status <> "P" THEN get_status
+get_status_done:
+    RETURN

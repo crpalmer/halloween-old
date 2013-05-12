@@ -1,0 +1,134 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL PIR         = PIN7
+SYMBOL CARP        = PIN4
+SYMBOL CASE_LIGHTS = PIN3
+SYMBOL CARP_READY  = PIN2
+SYMBOL CARP_PLAY   = PIN1
+SYMBOL CARP_FWD    = PIN0
+
+SYMBOL CARP_PAUSE = 50
+SYMBOL N_TRACKS = 9
+SYMBOL N_RANDOM_TRACKS = 6
+SYMBOL N_RESERVED_TRACKS = 3
+
+SYMBOL R = W0
+SYMBOL new_track = B2
+SYMBOL i = B3
+SYMBOL track = B4
+SYMBOL old0 = B5
+SYMBOL old1 = B6
+
+PINS = %00000000                              ' clear all outputs
+DIRS = %00011011                              ' make P0,1,3,4 outputs
+
+track = 0
+CARP = 1
+
+' main loop: wait, intro, random, finale, pause
+
+main:
+   i = 0
+'   GOTO main
+
+   DEBUG "Waiting for a customer", CR
+
+waiting_for_a_customer:
+   RANDOM R
+   i = i + 1 * PIR
+   IF i < 200 THEN waiting_for_a_customer
+
+  ' INTRO
+  DEBUG "Waiting for lights", CR
+  PAUSE 5000
+  DEBUG "Lights!", CR
+  CASE_LIGHTS = 1
+  PAUSE 500
+
+  DEBUG "Intro", CR
+  new_track = 0
+  GOSUB seek_to
+  GOSUB play_current_track
+
+  ' ADVERTISE OUR WARES
+
+  RANDOM R
+  i = R // 3 + 3
+  DEBUG "Advertising ", #i, CR
+
+  more_random_tracks:
+    RANDOM R
+    new_track = R // N_RANDOM_TRACKS + N_RESERVED_TRACKS
+    DEBUG "Consider ", #new_track, " when ", #track, ", ", #old0, ", ", #old1, CR
+    IF new_track = track THEN more_random_tracks
+    IF new_track = old0 THEN more_random_tracks
+    IF new_track = old1 THEN more_random_tracks
+    old1 = old0
+    old0 = track
+    GOSUB seek_to
+    GOSUB play_current_track
+    i = i - 1
+    IF i <> 0 THEN more_random_tracks
+
+  ' FINALES
+
+  RANDOM R
+  new_track = R // 2 + 1
+  DEBUG "Finale: ", #R, " gives ", #new_track, CR
+  GOSUB seek_to
+  GOSUB play_current_track
+
+  DEBUG "Lights off", CR
+  CASE_LIGHTS = 0
+  new_track = 0
+  GOSUB seek_to
+  PAUSE 5000
+
+  DEBUG "In between shows", CR
+  PAUSE 10000
+  GOTO main
+
+
+' ------------------- utilities --------------------
+
+
+' play_current_track
+'
+' Hit play on the CAR/P-200 and wait for it to finish playing
+
+play_current_track:
+  DEBUG "Playing track ", #track, CR
+  wait_to_play:
+    IF CARP_READY = 0 THEN wait_to_seek
+    CARP_PLAY=1
+    PAUSE CARP_PAUSE
+    CARP_PLAY=0
+    PAUSE CARP_PAUSE
+  still_playing:
+    IF CARP_READY = 0 THEN still_playing
+    RETURN
+
+' seek_to
+'
+' Input: new_track
+' Modifies: track
+'
+' Keep hitting FWD on the CAR/P-200 until the current track is
+' at new_track
+
+seek_to:
+'  DEBUG "Seeking from ", #track, " TO ", #new_track, CR
+  IF track <> new_track THEN seek_one
+  RETURN
+  seek_one:
+    track = track + 1 // N_TRACKS
+  wait_to_seek:
+    IF CARP_READY = 0 THEN wait_to_seek
+    CARP_FWD = 1
+    PAUSE CARP_PAUSE
+    CARP_FWD = 0
+    PAUSE CARP_PAUSE
+  still_seeking:
+    IF CARP_READY = 0 THEN still_seeking
+    GOTO seek_to

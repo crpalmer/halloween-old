@@ -1,0 +1,58 @@
+' {$STAMP BS1}
+' {$PBASIC 1.0}
+
+SYMBOL servo = PIN0
+SYMBOL signal = W0
+SYMBOL i = B11
+' W6 = B12/13 used for subroutine calls
+
+' PULSOUT sends a signal in units of 10us
+'
+' Modified Servo:
+'   * 1.5ms (150 units) == stop
+'   * bigger means speed left
+'   * smaller means speed right
+'   * on my one servo 152 was actually stop
+'
+' Unmodified Servo:
+'   * 1.5ms (150 units) == center position
+'   * 2.5ms (250 units) == 90 degrees left
+'   * 0.5ms ( 50 units) == 90 degrees right
+'   ? not sending any signal causes it to do nothing?
+'   ? servo seems to not be exactly centered
+
+main:
+
+
+signal = 152
+DEBUG "  Center = ", #signal
+
+FOR i = 1 TO 200
+  GOSUB servo_cmd
+NEXT
+
+signal = 230
+DEBUG "  Left = ", #signal
+
+FOR i = 1 TO 200
+  GOSUB servo_cmd
+NEXT
+
+signal = 60
+DEBUG "  Right = ", #signal
+
+FOR i = 1 TO 200
+  GOSUB servo_cmd
+NEXT
+
+DEBUG "  Nothing"
+FOR i = 1 TO 200
+  PAUSE 20
+NEXT
+
+GOTO main
+
+servo_cmd:
+  PULSOUT servo, signal
+  PAUSE 20
+  RETURN
