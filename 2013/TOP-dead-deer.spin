@@ -6,8 +6,8 @@ CON
   _clkfreq = 80_000_000
   _clkmode = xtal1 + pll16x
 
-  ANNIE_MIN_POS = 1100
-  ANNIE_RANGE = 850
+  MIN_POS = 1100
+  RANGE = 450
   
   VOLUME = 100
   SD_P0 = 0
