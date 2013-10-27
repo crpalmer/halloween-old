@@ -15,26 +15,23 @@ CON
   SKULL_SERVO = 7
   SKULL_LEDS = 6
 
-  WHEELS_COUNTDOWN_N_TRACKS = 25
-  N_TRACKS = 8 
+  WHEELS_COUNTDOWN_N_TRACKS = 5
 
 OBJ
 
   skull : "talking_skull"
   play_file : "play_file"
-  random_track : "random_track"
   debug : "Parallax Serial Terminal"
  
-PUB Deer | P, seed, ms, wheels_countdown, wav
+PUB Deer | P, seed, ms, wheels_countdown
 
   debug.start(250000)
   play_file.start(SD_P0, AUDIO_P0)
-  skull.start(ANNIE_MIN_POS, ANNIE_RANGE, play_file.sampleAddress, SKULL_SERVO, SKULL_LEDS, 1)
-  random_track.init
+  skull.start(MIN_POS, RANGE, play_file.sampleAddress, SKULL_SERVO, SKULL_LEDS, 1)
   
   seed := 1234567
   ms := clkfreq / 1000
-  wheels_countdown := WHEELS_COUNTDOWN_N_TRACKS
+  wheels_countdown := 2
   
   repeat
     wheels_countdown := wheels_countdown - 1
@@ -42,11 +39,9 @@ PUB Deer | P, seed, ms, wheels_countdown, wav
     debug.dec(wheels_countdown)
     if wheels_countdown == 0
       wheels_countdown := WHEELS_COUNTDOWN_N_TRACKS
-      'play_file.synchronously(STRING("wheels.wave"), 1)
+      play_file.synchronously(STRING("wheels.wav"), 1)
     else
-      wav := random_track.random_wave_file(N_TRACKS)
-      debug.str(wav) 
-      play_file.synchronously(wav, 1)
+      play_file.synchronously(STRING("monson.wav"), 1)
     ?seed
     P := ||seed
     P := P // 10000 + 3000
