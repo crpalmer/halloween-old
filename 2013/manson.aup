@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="no" ?>
 <!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
-<project xmlns="http://audacity.sourceforge.net/xml/" projname="manson_data" version="1.3.0" audacityversion="2.0.5" sel0="3.0159322291" sel1="3.0159322291" vpos="0" h="14.1899611377" zoom="596.8303871879" rate="22050.0">
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="manson_data" version="1.3.0" audacityversion="2.0.5" sel0="41.3216225739" sel1="41.3216225739" vpos="0" h="47.0418407017" zoom="298.4151935940" rate="22050.0">
 	<tags>
 		<tag name="ALBUM" value="Nightmare Revisited"/>
 		<tag name="TITLE" value="This Is Halloween"/>
@@ -12,7 +12,7 @@
 		<tag name="Band" value="Various"/>
 		<tag name="GENRE" value="Pop"/>
 	</tags>
-	<wavetrack name="03 This Is Halloween" channel="0" linked="0" mute="0" solo="0" height="241" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+	<wavetrack name="03 This Is Halloween" channel="0" linked="0" mute="0" solo="0" height="240" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
 		<waveclip offset="0.02097768">
 			<sequence maxsamples="262144" sampleformat="262159" numsamples="8153923">
 				<waveblock start="0">
@@ -115,7 +115,9 @@
 					<simpleblockfile filename="e00002f0.au" len="11648" min="-0.00007" max="0.000044" rms="0.00001"/>
 				</waveblock>
 			</sequence>
-			<envelope numpoints="0"/>
+			<envelope numpoints="1">
+				<controlpoint t="42.352870138237" val="0.897435903549"/>
+			</envelope>
 		</waveclip>
 	</wavetrack>
 	<wavetrack name="Audio Track" channel="1" linked="0" mute="1" solo="0" height="467" minimized="0" isSelected="1" rate="22050" gain="1.0" pan="0.0">
@@ -170,7 +172,7 @@
 					<simpleblockfile filename="e0000ea9.au" len="210428" min="-1.0" max="1.0" rms="0.895954"/>
 				</waveblock>
 			</sequence>
-			<envelope numpoints="128">
+			<envelope numpoints="385">
 				<controlpoint t="0.000005000000" val="0.000000100000"/>
 				<controlpoint t="0.073722787821" val="0.069444447756"/>
 				<controlpoint t="0.113935217542" val="1.000000000000"/>
@@ -294,11 +296,268 @@
 				<controlpoint t="14.551873005195" val="0.069444447756"/>
 				<controlpoint t="14.571979220056" val="1.000000000000"/>
 				<controlpoint t="14.702669616648" val="1.000000000000"/>
-				<controlpoint t="14.757961707514" val="0.000000100000"/>
+				<controlpoint t="14.702674616648" val="0.019522776827"/>
+				<controlpoint t="14.776392404469" val="0.657266795635"/>
+				<controlpoint t="14.841737602766" val="0.665943622589"/>
+				<controlpoint t="14.992534214218" val="0.310195237398"/>
 				<controlpoint t="15.049501822989" val="0.000000100000"/>
-				<controlpoint t="15.158410486816" val="0.000000100000"/>
+				<controlpoint t="15.101442878045" val="0.817787408829"/>
+				<controlpoint t="15.160081004722" val="0.826464235783"/>
+				<controlpoint t="15.282398811789" val="0.709327578545"/>
+				<controlpoint t="15.460003709722" val="0.188720166683"/>
+				<controlpoint t="15.537077533354" val="0.140997827053"/>
+				<controlpoint t="15.537082533354" val="0.796095430851"/>
+				<controlpoint t="15.602422731650" val="0.796095430851"/>
+				<controlpoint t="15.635933089750" val="0.101952277124"/>
+				<controlpoint t="15.744841753577" val="0.101952277124"/>
+				<controlpoint t="15.801814362348" val="0.778741836548"/>
+				<controlpoint t="15.919095615701" val="0.752711474895"/>
+				<controlpoint t="16.017951172097" val="0.000000100000"/>
+				<controlpoint t="16.212311249081" val="0.813449025154"/>
+				<controlpoint t="16.269278857852" val="0.813449025154"/>
+				<controlpoint t="16.344677163579" val="0.817787408829"/>
+				<controlpoint t="16.418399951400" val="0.470715820789"/>
+				<controlpoint t="16.537361722657" val="0.422993481159"/>
+				<controlpoint t="16.570872080758" val="0.982646405697"/>
+				<controlpoint t="16.740099389166" val="0.943600893021"/>
+				<controlpoint t="17.050070201597" val="0.561822116375"/>
+				<controlpoint t="17.108713328273" val="0.010845987126"/>
+				<controlpoint t="17.282967190396" val="0.019522776827"/>
+				<controlpoint t="17.296371333636" val="0.904555320740"/>
+				<controlpoint t="17.361716531932" val="0.891540110111"/>
+				<controlpoint t="17.430412766039" val="0.310195237398"/>
+				<controlpoint t="17.507486589670" val="0.869848132133"/>
+				<controlpoint t="17.710224256179" val="0.739696323872"/>
+				<controlpoint t="17.732005988944" val="0.327548801899"/>
+				<controlpoint t="17.964902977744" val="0.305856823921"/>
+				<controlpoint t="17.988360228414" val="0.800433814526"/>
+				<controlpoint t="18.110673035481" val="0.787418663502"/>
+				<controlpoint t="18.159263054727" val="0.869848132133"/>
+				<controlpoint t="18.331841398945" val="0.874186575413"/>
+				<controlpoint t="18.708832927577" val="0.579175710678"/>
+				<controlpoint t="18.775853643779" val="0.054229933769"/>
+				<controlpoint t="18.794284340734" val="0.817787408829"/>
+				<controlpoint t="18.821092627215" val="0.822125792503"/>
+				<controlpoint t="18.918272665706" val="0.214750543237"/>
+				<controlpoint t="18.928325773137" val="0.826464235783"/>
+				<controlpoint t="18.965187167047" val="0.817787408829"/>
+				<controlpoint t="19.062367205539" val="0.110629066825"/>
+				<controlpoint t="19.079122384589" val="0.817787408829"/>
+				<controlpoint t="19.193057602131" val="0.804772257805"/>
+				<controlpoint t="19.291913158528" val="0.041214749217"/>
+				<controlpoint t="19.374013535875" val="0.713665962219"/>
+				<controlpoint t="19.486273235512" val="0.596529304981"/>
+				<controlpoint t="19.608586042579" val="0.774403452873"/>
+				<controlpoint t="19.700739527356" val="0.735357940197"/>
+				<controlpoint t="19.891748568529" val="0.540130138397"/>
 				<controlpoint t="19.903477193865" val="0.000000100000"/>
 				<controlpoint t="19.930285480345" val="0.041666667908"/>
+				<controlpoint t="20.067677948558" val="0.869848132133"/>
+				<controlpoint t="20.189990755625" val="0.848156154156"/>
+				<controlpoint t="20.303925973167" val="0.574837327003"/>
+				<controlpoint t="20.431265333949" val="0.583514094353"/>
+				<controlpoint t="20.558604694732" val="0.631236433983"/>
+				<controlpoint t="20.769719950766" val="0.908893704414"/>
+				<controlpoint t="21.078015245291" val="0.895878553391"/>
+				<controlpoint t="21.210381159789" val="0.340563982725"/>
+				<controlpoint t="21.307561198281" val="0.444685459137"/>
+				<controlpoint t="21.444953666493" val="0.639913260937"/>
+				<controlpoint t="21.594074760041" val="0.635574817657"/>
+				<controlpoint t="21.674499619482" val="0.275488078594"/>
+				<controlpoint t="21.736493781969" val="0.279826462269"/>
+				<controlpoint t="21.754924478924" val="0.843817770481"/>
+				<controlpoint t="21.796812426550" val="0.800433814526"/>
+				<controlpoint t="21.920800751522" val="0.592190861702"/>
+				<controlpoint t="21.955986627528" val="0.930585682392"/>
+				<controlpoint t="22.051491148114" val="0.921908915043"/>
+				<controlpoint t="22.118511864316" val="0.774403452873"/>
+				<controlpoint t="22.239149153478" val="0.687635600567"/>
+				<controlpoint t="22.358110924735" val="0.691973984241"/>
+				<controlpoint t="22.431833712557" val="0.869848132133"/>
+				<controlpoint t="22.513934089903" val="0.869848132133"/>
+				<controlpoint t="22.594358949345" val="0.618221282959"/>
+				<controlpoint t="22.674783808786" val="0.904555320740"/>
+				<controlpoint t="22.849037670909" val="0.900216937065"/>
+				<controlpoint t="22.957946334736" val="0.062906727195"/>
+				<controlpoint t="23.060152926943" val="0.973969638348"/>
+				<controlpoint t="23.123822607334" val="0.965292870998"/>
+				<controlpoint t="23.204247466776" val="0.613882839680"/>
+				<controlpoint t="23.309805094793" val="0.683297157288"/>
+				<controlpoint t="23.433793419765" val="0.744034707546"/>
+				<controlpoint t="23.603020728173" val="0.557483732700"/>
+				<controlpoint t="23.696849730855" val="0.561822116375"/>
+				<controlpoint t="23.710253874095" val="0.908893704414"/>
+				<controlpoint t="24.127457832448" val="0.744034707546"/>
+				<controlpoint t="24.254797193230" val="0.093275487423"/>
+				<controlpoint t="24.367056892867" val="0.830802619457"/>
+				<controlpoint t="24.544661790801" val="0.748373091221"/>
+				<controlpoint t="24.660272526248" val="0.700650751591"/>
+				<controlpoint t="24.744048421500" val="0.848156154156"/>
+				<controlpoint t="25.002078178874" val="0.757049918175"/>
+				<controlpoint t="25.186385148428" val="0.839479386806"/>
+				<controlpoint t="25.615317732116" val="0.475054234266"/>
+				<controlpoint t="25.735955021278" val="0.015184381977"/>
+				<controlpoint t="25.953772348932" val="0.488069415092"/>
+				<controlpoint t="26.144781390106" val="0.488069415092"/>
+				<controlpoint t="26.252014536027" val="0.696312367916"/>
+				<controlpoint t="26.496640150162" val="0.856832981110"/>
+				<controlpoint t="26.764723014967" val="0.713665962219"/>
+				<controlpoint t="27.052912094632" val="0.453362256289"/>
+				<controlpoint t="27.233868028376" val="0.787418663502"/>
+				<controlpoint t="27.575673681002" val="0.939262449741"/>
+				<controlpoint t="27.947638655919" val="0.796095430851"/>
+				<controlpoint t="28.061573873461" val="0.028199566528"/>
+				<controlpoint t="28.068275945081" val="1.000000000000"/>
+				<controlpoint t="28.265987057875" val="0.917570471764"/>
+				<controlpoint t="28.339704845696" val="0.778741836548"/>
+				<controlpoint t="28.436889884188" val="1.000000000000"/>
+				<controlpoint t="28.591037531451" val="0.939262449741"/>
+				<controlpoint t="28.644654104412" val="0.596529304981"/>
+				<controlpoint t="28.688217569943" val="0.596529304981"/>
+				<controlpoint t="28.775344501004" val="0.895878553391"/>
+				<controlpoint t="28.929492148267" val="0.900216937065"/>
+				<controlpoint t="29.090341867150" val="0.752711474895"/>
+				<controlpoint t="29.271297800894" val="0.826464235783"/>
+				<controlpoint t="29.408690269106" val="0.783080279827"/>
+				<controlpoint t="29.616454489330" val="0.691973984241"/>
+				<controlpoint t="29.884537354135" val="0.800433814526"/>
+				<controlpoint t="30.105705717599" val="0.809110641479"/>
+				<controlpoint t="30.139216075700" val="0.995661616325"/>
+				<controlpoint t="30.491074835756" val="0.995661616325"/>
+				<controlpoint t="30.544691408717" val="0.045553144068"/>
+				<controlpoint t="30.782614951232" val="0.028199566528"/>
+				<controlpoint t="30.930060526874" val="0.561822116375"/>
+				<controlpoint t="30.973623992405" val="0.613882839680"/>
+				<controlpoint t="31.094261281567" val="0.605206072330"/>
+				<controlpoint t="31.188090284249" val="0.783080279827"/>
+				<controlpoint t="31.479630399725" val="0.553145349026"/>
+				<controlpoint t="31.533246972686" val="0.852494597435"/>
+				<controlpoint t="31.828138123971" val="0.592190861702"/>
+				<controlpoint t="31.938722305703" val="0.830802619457"/>
+				<controlpoint t="32.149837561737" val="0.878524959087"/>
+				<controlpoint t="32.347548674531" val="0.600867688656"/>
+				<controlpoint t="32.414569390732" val="0.678958773613"/>
+				<controlpoint t="32.568717037995" val="0.739696323872"/>
+				<controlpoint t="32.702758470397" val="0.674620389938"/>
+				<controlpoint t="32.803289544699" val="0.613882839680"/>
+				<controlpoint t="32.944033048722" val="0.288503259420"/>
+				<controlpoint t="32.950735120342" val="0.882863342762"/>
+				<controlpoint t="33.399768918890" val="0.796095430851"/>
+				<controlpoint t="33.604187103304" val="0.110629066825"/>
+				<controlpoint t="33.691314034366" val="0.114967465401"/>
+				<controlpoint t="33.691319034366" val="1.000000000000"/>
+				<controlpoint t="33.848812717439" val="0.991323232651"/>
+				<controlpoint t="33.952694827551" val="0.744034707546"/>
+				<controlpoint t="34.080034188333" val="0.839479386806"/>
+				<controlpoint t="34.277745301127" val="0.579175710678"/>
+				<controlpoint t="34.395031554479" val="0.561822116375"/>
+				<controlpoint t="34.441946055820" val="0.921908915043"/>
+				<controlpoint t="34.666465455094" val="0.735357940197"/>
+				<controlpoint t="34.766996529396" val="0.501084625721"/>
+				<controlpoint t="34.813911030736" val="0.783080279827"/>
+				<controlpoint t="35.014973179340" val="0.887201726437"/>
+				<controlpoint t="35.266300865095" val="0.830802619457"/>
+				<controlpoint t="35.527681658280" val="0.691973984241"/>
+				<controlpoint t="35.618159625151" val="0.800433814526"/>
+				<controlpoint t="35.701935520403" val="0.726681113243"/>
+				<controlpoint t="35.792413487275" val="0.453362256289"/>
+				<controlpoint t="35.852732131856" val="0.926247298717"/>
+				<controlpoint t="35.993475635878" val="0.887201726437"/>
+				<controlpoint t="36.295068858784" val="0.839479386806"/>
+				<controlpoint t="36.425759255376" val="0.444685459137"/>
+				<controlpoint t="36.476029792527" val="0.097613885999"/>
+				<controlpoint t="36.573204831019" val="0.457700639963"/>
+				<controlpoint t="36.734054549902" val="0.583514094353"/>
+				<controlpoint t="36.898255304595" val="0.453362256289"/>
+				<controlpoint t="36.965276020796" val="0.383947938681"/>
+				<controlpoint t="37.049051916048" val="0.605206072330"/>
+				<controlpoint t="37.276917351132" val="0.626898050308"/>
+				<controlpoint t="37.276922351132" val="0.817787408829"/>
+				<controlpoint t="37.390857568674" val="0.856832981110"/>
+				<controlpoint t="37.518196929457" val="0.791757047176"/>
+				<controlpoint t="37.652238361859" val="0.496746212244"/>
+				<controlpoint t="37.782928758452" val="0.613882839680"/>
+				<controlpoint t="37.880108796943" val="0.856832981110"/>
+				<controlpoint t="38.020852300966" val="0.943600893021"/>
+				<controlpoint t="38.114681303648" val="0.709327578545"/>
+				<controlpoint t="38.205159270519" val="0.978308022022"/>
+				<controlpoint t="38.252078771860" val="0.943600893021"/>
+				<controlpoint t="38.345902774542" val="0.770065069199"/>
+				<controlpoint t="38.352604846162" val="0.978308022022"/>
+				<controlpoint t="38.402870383313" val="0.991323232651"/>
+				<controlpoint t="38.674304283928" val="0.501084625721"/>
+				<controlpoint t="38.721218785269" val="0.778741836548"/>
+				<controlpoint t="38.801643644711" val="0.852494597435"/>
+				<controlpoint t="38.878717468342" val="0.757049918175"/>
+				<controlpoint t="38.955791291973" val="0.822125792503"/>
+				<controlpoint t="39.036216151415" val="0.704989135265"/>
+				<controlpoint t="39.069726509516" val="0.826464235783"/>
+				<controlpoint t="39.153502404767" val="0.770065069199"/>
+				<controlpoint t="39.213821049348" val="0.704989135265"/>
+				<controlpoint t="39.414883197952" val="0.058568328619"/>
+				<controlpoint t="39.424936305382" val="1.000000000000"/>
+				<controlpoint t="39.605892239125" val="0.969631254673"/>
+				<controlpoint t="39.686317098567" val="0.665943622589"/>
+				<controlpoint t="39.847166817450" val="0.605206072330"/>
+				<controlpoint t="40.001309464713" val="0.557483732700"/>
+				<controlpoint t="40.058282073484" val="0.718004345894"/>
+				<controlpoint t="40.255993186278" val="0.848156154156"/>
+				<controlpoint t="40.416842905161" val="0.778741836548"/>
+				<controlpoint t="40.534129158513" val="0.691973984241"/>
+				<controlpoint t="40.614554017954" val="0.639913260937"/>
+				<controlpoint t="40.634660232815" val="0.605206072330"/>
+				<controlpoint t="40.825669273988" val="0.596529304981"/>
+				<controlpoint t="40.859179632089" val="1.000000000000"/>
+				<controlpoint t="41.020029350972" val="0.986984789371"/>
+				<controlpoint t="41.190932177285" val="0.644251644611"/>
+				<controlpoint t="41.318271538067" val="0.605206072330"/>
+				<controlpoint t="41.348430860358" val="0.592190861702"/>
+				<controlpoint t="41.452312970470" val="0.557483732700"/>
+				<controlpoint t="41.509280579241" val="0.791757047176"/>
+				<controlpoint t="41.733799978515" val="0.887201726437"/>
+				<controlpoint t="42.028691129800" val="0.830802619457"/>
+				<controlpoint t="42.233104314214" val="0.596529304981"/>
+				<controlpoint t="42.326933316896" val="0.800433814526"/>
+				<controlpoint t="42.393954033097" val="0.670282006264"/>
+				<controlpoint t="42.444219570248" val="0.852494597435"/>
+				<controlpoint t="42.511240286449" val="0.613882839680"/>
+				<controlpoint t="42.531346501310" val="0.809110641479"/>
+				<controlpoint t="42.611771360751" val="0.592190861702"/>
+				<controlpoint t="42.648632754662" val="0.835141003132"/>
+				<controlpoint t="42.685494148573" val="0.483731031418"/>
+				<controlpoint t="42.735759685724" val="0.718004345894"/>
+				<controlpoint t="42.836290760025" val="0.895878553391"/>
+				<controlpoint t="42.863099046506" val="0.561822116375"/>
+				<controlpoint t="42.960279084998" val="0.817787408829"/>
+				<controlpoint t="42.987087371478" val="0.535791754723"/>
+				<controlpoint t="43.054108087680" val="0.813449025154"/>
+				<controlpoint t="43.131181911311" val="0.449023872614"/>
+				<controlpoint t="43.174745376842" val="0.926247298717"/>
+				<controlpoint t="43.241766093043" val="0.479392617941"/>
+				<controlpoint t="43.258521272093" val="0.986984789371"/>
+				<controlpoint t="43.402615811926" val="0.344902396202"/>
+				<controlpoint t="43.412668919356" val="0.670282006264"/>
+				<controlpoint t="43.483035671367" val="0.405639916658"/>
+				<controlpoint t="43.483040671367" val="0.874186575413"/>
+				<controlpoint t="43.590273817289" val="0.353579163551"/>
+				<controlpoint t="43.650592461871" val="0.527114987373"/>
+				<controlpoint t="43.650597461871" val="0.770065069199"/>
+				<controlpoint t="43.777931822653" val="0.171366587281"/>
+				<controlpoint t="43.798038037513" val="0.878524959087"/>
+				<controlpoint t="43.905271183435" val="0.470715820789"/>
+				<controlpoint t="43.955536720586" val="0.826464235783"/>
+				<controlpoint t="44.069471938128" val="0.262472897768"/>
+				<controlpoint t="44.183407155670" val="0.748373091221"/>
+				<controlpoint t="44.324150659693" val="0.514099776745"/>
+				<controlpoint t="44.444787948855" val="0.778741836548"/>
+				<controlpoint t="44.531914879917" val="0.323210418224"/>
+				<controlpoint t="44.558723166397" val="0.856832981110"/>
+				<controlpoint t="44.665956312319" val="0.284164845943"/>
+				<controlpoint t="44.712870813660" val="0.752711474895"/>
+				<controlpoint t="45.054676466287" val="0.548806965351"/>
+				<controlpoint t="45.346216581762" val="0.006507592276"/>
+				<controlpoint t="45.352918653382" val="0.000000100000"/>
+				<controlpoint t="45.416588333773" val="0.000000100000"/>
 			</envelope>
 		</waveclip>
 	</wavetrack>
