@@ -41,10 +41,20 @@ PUB Deer | P, seed, ms, wheels_countdown
       wheels_countdown := WHEELS_COUNTDOWN_N_TRACKS
       play_file.synchronously(STRING("wheels.wav"), 1)
     else
-      play_file.synchronously(STRING("monson.wav"), 1)
+      play_file.synchronously(STRING("manson.wav"), 1)
+
     ?seed
-    P := ||seed
-    P := P // 10000 + 3000
-    debug.str(STRING(" sleep="))
+    P := ||seed              
+    P := P // 7000 + 3000
+    debug.str(STRING(" sleep1="))
+    debug.dec(P)
+    waitcnt(cnt + ms * P)
+
+    play_file.synchronously(STRING("blink.wav"), 1)
+    
+    ?seed
+    P := ||seed              
+    P := P // 7000 + 3000
+    debug.str(STRING(" sleep2="))
     debug.dec(P)
     waitcnt(cnt + ms * P)            
