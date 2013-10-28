@@ -44,7 +44,7 @@ PUB CasaFearZombie | seed, P, last, last2, track, pause, error
   ByteMove(@filename, STRING("00.wav"), 7)
 
   debug.str(STRING("Loading SDcard", 13))  
-  play_file.start(SD_P0, AUDIO_P0, VOLUME)
+  play_file.start(SD_P0, AUDIO_P0)
 
   cognew(backgroundThrashing, @stack)
   
@@ -75,7 +75,7 @@ PUB CasaFearZombie | seed, P, last, last2, track, pause, error
     filename[1] := track // 10 + ZERO_CHAR
 
     thrashing := 1
-    play_file.synchronously(@filename)
+    play_file.synchronously(@filename, 2)
     thrashing := 0
 
     ?seed
@@ -116,4 +116,3 @@ PRI backgroundThrashing | seed, P, MYms
     P := P // (MOVE_PAUSE_MAX - MOVE_PAUSE_MIN) + MOVE_PAUSE_MIN
     waitcnt(cnt + (P * myms))
    
-
