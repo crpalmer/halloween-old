@@ -22,6 +22,7 @@ SYMBOL fogger = W2
 SYMBOL head   = W3
 SYMBOL fogger_lockout = W4
 
+PINS = %00000000
 DIRS = %00001111
 
 again:
