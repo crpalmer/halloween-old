@@ -11,22 +11,22 @@ Jousters
 * wires connecting the jouster to the controller hang and travel all over the
   place in the gap between the two tracks
 
-      +------+
-      +-+--+-+
-   BB1| |  | |IR1
-      | |  | |
-      | |  | |
-      | |w | |
-      | |i | |
-      | | r| |
-      | | e| |
-      | | s| |
-      | |  | |
-      | |  | |
-      | |  | |
-   BB2| |  | |IR2
-      +-+--+-+
-      +------+
+      +------+        +------+
+      +-+--+-+        +-+--+-+
+   BB1| |  | |IR1     | |  | |
+      | |  | |        | |  | |
+      | |  | |        | |  | |
+      | |w | |        | |  | |
+      | |i | |        | |  | |
+   BB2| | r| |IR2  IR2| |  | |BB2
+      | | e| |        | |  | |
+      | | s| |        | |  | |
+      | |  | |        | |  | |
+      | |  | |        | |  | |
+      | |  | |        | |  | |
+      | |  | |     IR1| |  | |BB1
+      +-+--+-+        +-+--+-+
+      +------+        +------+
 
 * entire track is 16 feet long
   * wheels ride on a road of 2 lengths of plywood joined together with pocket screws
@@ -38,17 +38,14 @@ Jousters
   * build 2x4 supports based on how floppy the assembly ends up being (both ends & middle?)
 
 * when reset
-  * each jouster does
-    * if no breakbeam is active the go forward direction at slow speed
-    * when jouster triggers a breakbeam stop
-  * each jouster gets facing the right direction
-    * if jouster is on beam 1 then servo at 0 degrees else servo at 180 degrees
-  * if they are both on the same side, move jouster 1 down to the other side
-    * start motor backward at slow speed
-    * stop when breakbeam is detected
-  * each jouster gets facing the right direction (see above)
+  * enable ir leds
+  * go forward slowly for 1 second
+  * while bb1 is not active, go backward at slow speed
+  * stop motor
+  * disable ir leds
 
 * when triggered
+  * enable ir leds
   * play trumpet sound
   * turn on all motors at full
   * play horse galloping sound
@@ -57,9 +54,12 @@ Jousters
   * gradually slow down motors to slow speed
   * play trot sound
   * wait until ir breakbeam is triggered
+  * play beeping sound
+  * go backward at slow speed
+  * wait for bb1 to be triggered
   * stop motor
   * stop audio
-  * goto reset
+  * disable ir leds
 
 OUTPUT 1: 12V 4amp+ power supply on Vext
 
@@ -93,17 +93,8 @@ USB PORTS
 
 usb 1 wifi
 usb 2 audio (trumpets and horses?)
-usb 3 servos
-usb 4
-
-SERVOS: 6V 1amp+ power supply
-
-servo 1; jouster 1 spin
-servo 2: jouster 2 spin
 
 WIRES TO JOUSTER
 
 cat5: 1,2: motor 1 12V
       3,4: motor 2 12V
-      5,6,7: servo
-
