@@ -12,7 +12,6 @@ Jousters
   place in the gap between the two tracks
 
       +------+        +------+
-      +-+--+-+        +-+--+-+
    BB1| |  | |IR1     | |  | |
       | |  | |        | |  | |
       | |  | |        | |  | |
@@ -25,7 +24,6 @@ Jousters
       | |  | |        | |  | |
       | |  | |        | |  | |
       | |  | |     IR1| |  | |BB1
-      +-+--+-+        +-+--+-+
       +------+        +------+
 
 * entire track is 16 feet long
@@ -34,7 +32,8 @@ Jousters
   * walls on tracks are 2 lengths of plywood, one cut in half so we have
     1/2 length, full length, 1/2 length down each side (provides support where the
     two lenghts of the "road" are joined)
-  * join the two tracks at each end on a 2x4 to close it off
+  * cap off the ends of the track with another piece of plywood (nailed)
+  * mount the tracks on 2x4 braces, legs, etc to form the stand
   * build 2x4 supports based on how floppy the assembly ends up being (both ends & middle?)
 
 * when reset
